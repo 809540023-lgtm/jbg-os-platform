@@ -1,0 +1,28 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "noEmit": true,
+    "types": ["node", "vitest/globals"],
+    "paths": {
+      "@jbg/db": ["packages/db/src/index.ts"],
+      "@jbg/db/*": ["packages/db/src/*"],
+      "@jbg/domain": ["packages/domain/src/index.ts"],
+      "@jbg/domain/*": ["packages/domain/src/*"],
+      "@jbg/harness": ["packages/harness/src/index.ts"],
+      "@jbg/harness/*": ["packages/harness/src/*"],
+      "@jbg/prompts": ["packages/prompts/src/index.ts"],
+      "@jbg/skills": ["packages/skills/src/index.ts"],
+      "@jbg/connectors": ["packages/connectors/src/index.ts"],
+      "@jbg/eval": ["packages/eval/src/index.ts"]
+    }
+  },
+  "include": [
+    "packages/**/*.ts",
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "scripts/**/*.ts",
+    "tests/**/*.ts"
+  ],
+  "exclude": ["node_modules", "**/dist/**", ".next"]
+}
