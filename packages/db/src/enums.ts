@@ -66,25 +66,47 @@ export const AGENT_CODE = [
 ] as const;
 export type AgentCode = (typeof AGENT_CODE)[number];
 
-/** Loop step 類型 —— docs/08 Loop DSL。 */
-export const STEP_TYPE = [
+/**
+ * loop_step_kind —— 對齊 migration（DB 真值）：agent/skill/connector/human/system。
+ * 注意：docs/08 Loop DSL 另有控制流的 `branch` 型別，見 domain/loop 的 StepType（DSL 超集）。
+ * 兩者差異已記於 docs/RECONCILIATION.md（待合約定案）。
+ */
+export const LOOP_STEP_KIND = [
   "agent",
   "skill",
   "connector",
   "human",
-  "branch",
+  "system",
 ] as const;
-export type StepType = (typeof STEP_TYPE)[number];
+export type LoopStepKind = (typeof LOOP_STEP_KIND)[number];
 
-/** 每步的執行狀態（loop_steps.status）。 */
-export const STEP_STATUS = [
+/** loop_step_status（loop_steps.status）—— 與 migration 逐字一致。 */
+export const LOOP_STEP_STATUS = [
   "pending",
   "running",
   "succeeded",
   "failed",
   "skipped",
 ] as const;
-export type StepStatus = (typeof STEP_STATUS)[number];
+export type LoopStepStatus = (typeof LOOP_STEP_STATUS)[number];
+
+/**
+ * product_status —— 對齊 migration（docs/06 落地值）。
+ * 注意：docs/05 §5.12.2 曾述「Product 共用 listing_status」，與此 DB 真值不同；
+ * 以 DB 為準，差異記於 docs/RECONCILIATION.md。
+ */
+export const PRODUCT_STATUS = [
+  "ingested",
+  "assembled",
+  "gap",
+  "priced",
+  "composed",
+  "reviewing",
+  "published",
+  "sold",
+  "archived",
+] as const;
+export type ProductStatus = (typeof PRODUCT_STATUS)[number];
 
 /** Memory 類型 —— docs/00 §0.5 Memory。 */
 export const MEMORY_TYPE = [

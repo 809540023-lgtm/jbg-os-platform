@@ -1,5 +1,12 @@
-import type { LoopExecutionStatus, StepStatus, StepType } from "@jbg/db";
+import type { LoopExecutionStatus, LoopStepKind, LoopStepStatus } from "@jbg/db";
 import type { LoopExecutionId, LoopId, LoopStepId } from "../shared/id";
+
+/**
+ * Loop DSL 的 step 型別（docs/08）= DB loop_step_kind 超集，額外含控制流 `branch`。
+ * 持久化時 `branch` 記為 DB 的 `system`（見 docs/RECONCILIATION.md）。
+ */
+export type StepType = LoopStepKind | "branch";
+export type StepStatus = LoopStepStatus;
 
 /**
  * Loop DSL —— docs/08。一個 Loop 的「定義」(steps 圖 + 觸發 + 終止)。

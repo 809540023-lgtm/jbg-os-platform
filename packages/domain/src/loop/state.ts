@@ -1,4 +1,4 @@
-import type { LoopExecutionStatus, StepStatus } from "@jbg/db";
+import type { LoopExecutionStatus, LoopStepStatus } from "@jbg/db";
 import { defineStateMachine } from "../shared/state-machine";
 
 /**
@@ -19,7 +19,7 @@ export const loopExecutionMachine = defineStateMachine<LoopExecutionStatus>({
 });
 
 /** 單一步驟狀態機（loop_steps.status）。 */
-export const loopStepMachine = defineStateMachine<StepStatus>({
+export const loopStepMachine = defineStateMachine<LoopStepStatus>({
   name: "loop_step",
   initial: "pending",
   transitions: {
