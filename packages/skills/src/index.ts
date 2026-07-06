@@ -1,9 +1,11 @@
 import type { z } from "zod";
 
+export * from "./publish-listing";
+export * from "./product-lifecycle-executor";
+
 /**
  * @jbg/skills —— 可被 Agent/Loop 呼叫的能力單元（§0.4 layer6，附錄 E）。
- * Skill id：kebab-case、動詞開頭。每個 skill 宣告 input/output schema。
- * 具體 skill 在 Todo 4+ 逐步加入；此處為 registry 骨架。
+ * Skill id：kebab-case、動詞開頭。skills 可依賴 connectors + domain（附錄 A.1.1）。
  */
 export interface Skill<I = unknown, O = unknown> {
   id: string;

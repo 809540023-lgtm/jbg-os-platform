@@ -7,3 +7,4 @@ export * from "./perception";
 export * from "./pricing";
 export * from "./channel";
 export * from "./review";
+export * from "./memory";

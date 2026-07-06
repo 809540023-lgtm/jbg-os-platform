@@ -11,8 +11,8 @@ const AGENT_META: Record<string, { name: string; role: string; done: boolean }> 
   price: { name: "Price", role: "估價：建議價/區間/理由", done: true },
   marketing: { name: "Marketing", role: "寫 FB 文案草稿", done: true },
   reviewer: { name: "Reviewer", role: "自動品管：pass/reject", done: true },
-  publisher: { name: "Publisher", role: "發佈到 FB（需 connector）", done: false },
-  memory: { name: "Memory", role: "萃取記憶（需 DB）", done: false },
+  publisher: { name: "Publisher", role: "發佈到 FB（過 Policy + connector）", done: true },
+  memory: { name: "Memory", role: "從成交萃取記憶", done: true },
 };
 
 const LIFECYCLE = [
@@ -37,6 +37,9 @@ const DONE_STAGES = new Set([
   "price",
   "compose",
   "review",
+  "human-review",
+  "publish",
+  "remember",
 ]);
 
 const MVP_TODOS = [
@@ -44,9 +47,10 @@ const MVP_TODOS = [
   { n: "5–7", label: "M1 感知（ocr ‖ vision + perceive）", done: true },
   { n: "8–9", label: "M2 組裝（assemble + gap-check）", done: true },
   { n: "10–12", label: "推理 agents（price / marketing / reviewer）", done: true },
-  { n: "4", label: "drive connector（需憑證）", done: false },
-  { n: "13–15", label: "Human Review 面板 + publisher + LINE", done: false },
-  { n: "16–17", label: "memory + Observability trace", done: false },
+  { n: "14/16", label: "publisher + memory + product-lifecycle 端到端（fake connector）", done: true },
+  { n: "4", label: "drive connector 實接（需憑證）", done: false },
+  { n: "13/17", label: "Human Review 面板 UI + Observability trace", done: false },
+  { n: "—", label: "Supabase repo 實作（persistence 層）", done: false },
 ];
 
 function Badge({ done }: { done: boolean }) {
@@ -79,7 +83,7 @@ export default function DashboardPage() {
           <span className="rounded border border-line bg-panel px-2 py-1">
             Agents {doneAgents}/{AGENT_CODE.length}
           </span>
-          <span className="rounded border border-line bg-panel px-2 py-1">34/34 tests ✓</span>
+          <span className="rounded border border-line bg-panel px-2 py-1">38/38 tests ✓</span>
         </div>
       </header>
 

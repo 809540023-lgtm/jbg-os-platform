@@ -90,6 +90,15 @@ importers:
 
   packages/skills:
     dependencies:
+      '@jbg/connectors':
+        specifier: workspace:*
+        version: link:../connectors
+      '@jbg/db':
+        specifier: workspace:*
+        version: link:../db
+      '@jbg/domain':
+        specifier: workspace:*
+        version: link:../domain
       zod:
         specifier: ^3.23.8
         version: 3.25.76

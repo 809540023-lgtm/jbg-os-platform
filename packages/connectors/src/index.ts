@@ -1,9 +1,12 @@
 import type { ConnectorKind } from "@jbg/db";
 
+export * from "./facebook";
+export * from "./drive";
+export * from "./line";
+
 /**
  * @jbg/connectors —— 對外部系統的唯一出口（§0.4 layer7，§0.8，附錄 F）。
  * 鐵律：Agent/Loop/Skill 不得直接 fetch 外部 API，一律經此層。
- * drive/facebook/line 的實作在 Todo 4 / 14 / 15 加入；此處為介面骨架。
  */
 export interface Connector {
   kind: ConnectorKind;

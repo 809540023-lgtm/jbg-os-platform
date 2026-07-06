@@ -94,10 +94,16 @@ export function defaultMvpRules(opts?: { priceThreshold?: Money }): PolicyRule[]
       reason: "唯讀動作放行",
     },
     {
+      id: "publish-approved-allow",
+      when: (r) => r.action === ACTIONS.PUBLISH && r.context?.humanApproved === true,
+      effect: "allow",
+      reason: "已通過 Human Review，授權發佈",
+    },
+    {
       id: "publish-requires-human",
       when: (r) => r.action === ACTIONS.PUBLISH,
       effect: "require_human",
-      reason: "發佈至 FB 為不可逆外部副作用，一律人審（§0.9）",
+      reason: "發佈至 FB 為不可逆外部副作用，未經人審一律需人審（§0.9）",
     },
     {
       id: "price-apply-threshold",

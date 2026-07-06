@@ -20,3 +20,29 @@ export const marketingDraftSchema = z.object({
   requiresHumanReview: z.boolean(),
 });
 export type MarketingDraft = z.infer<typeof marketingDraftSchema>;
+
+/** Publisher 契約 —— docs/07 §7.3.6。只接受 approved、冪等、發佈前過 PolicyEngine。 */
+export const publishInputSchema = z.object({
+  listingId: z.string(),
+  productId: z.string(),
+  status: z.literal("approved"),
+  content: z.object({
+    title: z.string(),
+    body: z.string(),
+    hashtags: z.array(z.string()),
+    mediaUrls: z.array(z.string()),
+  }),
+  idempotencyKey: z.string(), // = listingId + version
+});
+export type PublishInput = z.infer<typeof publishInputSchema>;
+
+export const publishResultSchema = z.object({
+  listingId: z.string(),
+  published: z.boolean(),
+  externalPostId: z.string().nullable(),
+  publishedAt: z.string().nullable(),
+  error: z.string().optional(),
+  /** policy 判定需人審而暫停時為 true。 */
+  needsHuman: z.boolean().optional(),
+});
+export type PublishResult = z.infer<typeof publishResultSchema>;
