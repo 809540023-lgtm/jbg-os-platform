@@ -1,0 +1,25 @@
+# deps
+node_modules/
+.pnpm-store/
+
+# build
+.next/
+dist/
+out/
+.turbo/
+
+# env / secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# supabase
+supabase/.branches/
+supabase/.temp/
+
+# misc
+.DS_Store
+*.log
+coverage/
+.vercel/

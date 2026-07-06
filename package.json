@@ -1,0 +1,26 @@
+{
+  "name": "jbg-os",
+  "version": "0.1.0",
+  "private": true,
+  "description": "JBG OS — AI Business Operating System. First vertical: Second-Hand AI Platform (SHAP).",
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "turbo run dev --filter=app",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "db:types": "tsx scripts/gen-db-types.ts",
+    "new:agent": "tsx scripts/new-agent.ts",
+    "new:loop": "tsx scripts/new-loop.ts",
+    "new:skill": "tsx scripts/new-skill.ts"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "typescript": "^5.5.0",
+    "tsx": "^4.0.0"
+  }
+}
