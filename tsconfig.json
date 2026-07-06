@@ -3,6 +3,10 @@
   "compilerOptions": {
     "baseUrl": ".",
     "noEmit": true,
+    "jsx": "preserve",
+    "allowJs": true,
+    "incremental": true,
+    "plugins": [{ "name": "next" }],
     "types": ["node", "vitest/globals"],
     "paths": {
       "@jbg/db": ["packages/db/src/index.ts"],
@@ -14,15 +18,18 @@
       "@jbg/prompts": ["packages/prompts/src/index.ts"],
       "@jbg/skills": ["packages/skills/src/index.ts"],
       "@jbg/connectors": ["packages/connectors/src/index.ts"],
-      "@jbg/eval": ["packages/eval/src/index.ts"]
+      "@jbg/eval": ["packages/eval/src/index.ts"],
+      "@/*": ["app/*"]
     }
   },
   "include": [
+    "next-env.d.ts",
     "packages/**/*.ts",
     "app/**/*.ts",
     "app/**/*.tsx",
     "scripts/**/*.ts",
-    "tests/**/*.ts"
+    "tests/**/*.ts",
+    ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules", "**/dist/**", ".next"]
 }

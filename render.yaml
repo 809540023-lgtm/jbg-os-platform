@@ -1,0 +1,28 @@
+# Render Blueprint —— JBG OS Next.js web service。
+# 在 Render Dashboard → New → Blueprint，連上這個 GitHub repo 即會讀取本檔。
+# 注意：正式 hosting 依 Bible §0.3 建議為 Vercel；此檔提供 Render 部署路徑。
+services:
+  - type: web
+    name: jbg-os
+    runtime: node
+    region: singapore # 離台灣/日本較近
+    plan: free
+    branch: main
+    buildCommand: corepack enable && pnpm install --no-frozen-lockfile && pnpm build
+    startCommand: pnpm start
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22" # sharp 在 Node 22 有預編譯 binary，避免 build from source
+      - key: NODE_ENV
+        value: production
+      # ── 之後接 Supabase / Anthropic 時再於 Render 後台填入（勿寫進 repo）──
+      # - key: NEXT_PUBLIC_SUPABASE_URL
+      #   sync: false
+      # - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+      #   sync: false
+      # - key: SUPABASE_SERVICE_ROLE_KEY
+      #   sync: false
+      # - key: ANTHROPIC_API_KEY
+      #   sync: false
