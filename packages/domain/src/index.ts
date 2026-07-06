@@ -4,3 +4,6 @@ export * from "./agent";
 export * from "./governance";
 export * from "./catalog";
 export * from "./perception";
+export * from "./pricing";
+export * from "./channel";
+export * from "./review";
