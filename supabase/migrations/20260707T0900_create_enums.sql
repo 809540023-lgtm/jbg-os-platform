@@ -59,7 +59,7 @@ end $$;
 do $$ begin
   if not exists (select 1 from pg_type where typname = 'loop_step_kind') then
     create type loop_step_kind as enum (
-      'agent', 'skill', 'connector', 'human', 'system'
+      'agent', 'skill', 'connector', 'human', 'system', 'branch'
     );
   end if;
 end $$;
@@ -192,7 +192,7 @@ end $$;
 
 do $$ begin
   if not exists (select 1 from pg_type where typname = 'policy_effect') then
-    create type policy_effect as enum ('allow', 'deny');
+    create type policy_effect as enum ('allow', 'deny', 'require_human');
   end if;
 end $$;
 

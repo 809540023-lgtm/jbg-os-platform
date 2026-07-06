@@ -1240,7 +1240,9 @@ export interface Actor extends AuditFields {
 | `waiting_human` | `review_expired` | now>expiresAt | `failed`(或依 policy 回 `running`) | emit `ReviewExpired`；依 policy 決定 fail 或降級 |
 | `waiting_human` | `cancel` | actor 有權 | `cancelled` | 關聯 HR 標 `expired`；emit `LoopExecutionCancelled` |
 
-### 5.12.2 `Product` / `Listing` 狀態機（共用 `listing_status`，對應 §0.11）
+### 5.12.2 `Product` / `Listing` 狀態機（對應 §0.11）
+
+> **R1 定案（2026-07-07）**：`Product` 使用**獨立**的 `product_status`（`ingested → assembled → gap → priced → composed → reviewing → published → sold → archived`），**不與 `Listing` 共用** `listing_status`。下方共用圖僅適用 `Listing`；`Product` 的細階段映射見 `docs/06` 與 `@jbg/db` 的 `PRODUCT_STATUS`。原「共用」敘述已作廢。
 
 ```
 [draft] ──submit(gap_clear & price_set)──► [in_review] ──approve──► [approved]

@@ -265,9 +265,16 @@ queued → running → waiting_human → running → succeeded
 
 `human_review_status`：`pending → approved | rejected | edited | expired`。
 `task_status`：`open → in_progress → done | blocked | cancelled`。
-`listing_status`：`draft → in_review → approved → published → sold → archived`。
+`product_status`（**權威**，R1 定案）：`ingested → assembled → gap → priced → composed → reviewing → published → sold → archived`。Product 用此細階段，**不共用** `listing_status`。
+`listing_status`（僅 `Listing` 用）：`draft → in_review → approved → published → sold → archived`。
 
-> 各狀態機完整轉移圖在 `docs/05` §State Machine 與 `docs/08`。
+其他與 loop/agent 相關的 DB enum（權威值以 `docs/06` migration 為準）：
+- `loop_step_kind`：`agent | skill | connector | human | system | branch`（含控制流 `branch`，R2 定案）。
+- `loop_step_status`：`pending | running | succeeded | failed | skipped`。
+- `agent_run_status`：`queued | running | succeeded | failed`。
+- `policy_effect`：`allow | deny | require_human`（含 `require_human`，R3 定案）。
+
+> 各狀態機完整轉移圖在 `docs/05` §State Machine 與 `docs/08`。R1–R4 的定案紀錄見 `docs/RECONCILIATION.md`。
 
 ---
 

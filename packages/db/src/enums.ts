@@ -66,19 +66,20 @@ export const AGENT_CODE = [
 ] as const;
 export type AgentCode = (typeof AGENT_CODE)[number];
 
-/**
- * loop_step_kind —— 對齊 migration（DB 真值）：agent/skill/connector/human/system。
- * 注意：docs/08 Loop DSL 另有控制流的 `branch` 型別，見 domain/loop 的 StepType（DSL 超集）。
- * 兩者差異已記於 docs/RECONCILIATION.md（待合約定案）。
- */
+/** loop_step_kind —— 對齊 migration（含控制流 `branch`，見 R2 裁決）。 */
 export const LOOP_STEP_KIND = [
   "agent",
   "skill",
   "connector",
   "human",
   "system",
+  "branch",
 ] as const;
 export type LoopStepKind = (typeof LOOP_STEP_KIND)[number];
+
+/** policy_effect —— 對齊 migration（含 require_human，見 R3 裁決）。 */
+export const POLICY_EFFECT = ["allow", "deny", "require_human"] as const;
+export type PolicyEffectValue = (typeof POLICY_EFFECT)[number];
 
 /** loop_step_status（loop_steps.status）—— 與 migration 逐字一致。 */
 export const LOOP_STEP_STATUS = [

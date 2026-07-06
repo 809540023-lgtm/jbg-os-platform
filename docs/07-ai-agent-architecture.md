@@ -16,7 +16,7 @@
 
 | 層次 | 是什麼 | 誰負責 | 載體 |
 |---|---|---|---|
-| **Agent** | AI 執行單元的**定義**（角色 + I/O schema + 可用 skill/connector） | 撰寫者 | `Agent` entity + `packages/agents/*` |
+| **Agent** | AI 執行單元的**定義**（角色 + I/O schema + 可用 skill/connector） | 撰寫者 | `Agent` entity + `packages/domain/src/agent/agents/*`（R4 定案，依附錄 A 分層） |
 | **AgentRun** | Agent 的**一次執行**（input/output/cost/trace） | Harness | `AgentRun` entity |
 | **Harness** | 包住模型呼叫的**外殼**（重試、schema 驗證、記帳、逾時） | 平台 | `packages/harness` |
 
@@ -173,7 +173,7 @@ export interface AgentRunResult<O> {
 | **eval 指標** | `brand_accuracy`, `category_accuracy`, `defect_recall`, `calibration`（信心校準） |
 
 ```ts
-// packages/agents/vision/schema.ts
+// schema：packages/domain/src/<context>/schema.ts；Agent 定義：packages/domain/src/agent/agents/vision.ts（R4 定案）
 export interface VisionInput {
   photoId: string;
   imageUrl: string;          // Supabase Storage signed URL
@@ -226,7 +226,7 @@ knownCategories: {{knownCategories}}
 | **eval 指標** | `char_error_rate`, `field_extraction_accuracy`, `serial_precision` |
 
 ```ts
-// packages/agents/ocr/schema.ts
+// schema：packages/domain/src/<context>/schema.ts；Agent 定義：packages/domain/src/agent/agents/ocr.ts（R4 定案）
 export interface OCRInput { photoId: string; imageUrl: string; hint?: "tag"|"label"|"serial"; }
 
 export interface OCRResult {
@@ -271,7 +271,7 @@ export interface OCRResult {
 | **eval 指標** | `price_mape`（與實際成交誤差）, `range_coverage`, `calibration` |
 
 ```ts
-// packages/agents/price/schema.ts
+// schema：packages/domain/src/<context>/schema.ts；Agent 定義：packages/domain/src/agent/agents/price.ts（R4 定案）
 export interface PriceInput {
   productId: string;
   productCard: { brand: string|null; category: string|null; condition: string; attachments: string[]; defects: string[] };
@@ -324,7 +324,7 @@ export interface PriceSuggestion {
 | **eval 指標** | `factuality`（賣點對照事實）, `compliance_pass_rate`, `ctr_proxy`（人審評分） |
 
 ```ts
-// packages/agents/marketing/schema.ts
+// schema：packages/domain/src/<context>/schema.ts；Agent 定義：packages/domain/src/agent/agents/marketing.ts（R4 定案）
 export interface MarketingInput {
   productId: string;
   productCard: Record<string, unknown>;
@@ -374,7 +374,7 @@ export interface MarketingDraft {   // → Listing (status: draft)
 | **eval 指標** | `precision`（誤放行率）, `recall`（誤退回率）, `agreement_with_human` |
 
 ```ts
-// packages/agents/reviewer/schema.ts
+// schema：packages/domain/src/<context>/schema.ts；Agent 定義：packages/domain/src/agent/agents/reviewer.ts（R4 定案）
 export interface ReviewInput {
   productId: string;
   card: Record<string, unknown>;
@@ -421,7 +421,7 @@ export interface ReviewResult {
 | **eval 指標** | `publish_success_rate`, `idempotency_violations`（應為 0）, `policy_deny_rate` |
 
 ```ts
-// packages/agents/publisher/schema.ts
+// schema：packages/domain/src/<context>/schema.ts；Agent 定義：packages/domain/src/agent/agents/publisher.ts（R4 定案）
 export interface PublishInput {
   listingId: string;
   productId: string;
@@ -470,7 +470,7 @@ Listing：{{listing}}
 | **eval 指標** | `fact_reusability`（人審抽樣）, `dedup_rate`, `link_precision` |
 
 ```ts
-// packages/agents/memory/schema.ts
+// schema：packages/domain/src/<context>/schema.ts；Agent 定義：packages/domain/src/agent/agents/memory.ts（R4 定案）
 export interface MemoryInput {
   sourceType: "order" | "inquiry" | "aftersale";
   sourceId: string;
@@ -698,7 +698,7 @@ export type PolicyDecision =
 ## 本章交付物 (Deliverables)
 
 1. `packages/harness/` —— `Harness.run()`：ContextSnapshot → Prompt → 模型 → schema 驗證 → 記帳 → 輸出，含重試/逾時（§7.1）。
-2. `packages/agents/{vision,ocr,price,marketing,reviewer,publisher,memory}/` —— 7 個 Agent，各含 `schema.ts`（input/output Zod + TS type）、`prompt.ts`、`definition.ts`（照 §7.2 模板 11 格）。
+2. `packages/domain/src/agent/agents/{vision,ocr,price,marketing,reviewer,publisher,memory}.ts` —— 7 個 Agent 定義（照 §7.2 模板 11 格）；各 Agent 的 I/O schema 放對應 context package（`perception`/`pricing`/`channel`/`review`…）的 `schema.ts`（Zod + z.infer 型別）；prompt 放 `@jbg/prompts`。（R4 定案，依附錄 A 分層）
 3. `packages/governance/human-review/` —— `HumanReviewPayload` / `HumanReviewDecision` 型別 + 回寫 LX 的 `resolveHumanReview()`（§7.4）。
 4. `packages/governance/policy/` —— `PolicyEngine`：`PolicyRequest → PolicyDecision`，含 §7.5.3 關鍵策略清單的預設規則（fail-closed）。
 5. `MODELS` 常數設定檔（`MODELS.REASONING/VISION/FAST`，值來自 env，不硬寫模型 id）。
