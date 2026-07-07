@@ -1,8 +1,11 @@
 import { AGENT_CODE, PRODUCT_STATUS } from "@jbg/db";
+import { listAgents, loadDashboard, type DashboardSnapshot } from "@jbg/persistence";
+import { getServerDb } from "./lib/server-db";
+
+export const dynamic = "force-dynamic";
 
 /**
- * JBG OS Dashboard —— MVP 首頁（server component）。
- * 目前為狀態總覽（讀 canonical model）；接上 Supabase 後改為即時 LoopExecution/HR 佇列。
+ * JBG OS Dashboard —— 有接 DB 時顯示即時狀態；無 DB（例如尚未設定的部署）回退靜態 canonical。
  */
 
 const AGENT_META: Record<string, { name: string; role: string; done: boolean }> = {
@@ -16,63 +19,44 @@ const AGENT_META: Record<string, { name: string; role: string; done: boolean }> 
 };
 
 const LIFECYCLE = [
-  "drive-ingest",
-  "perceive",
-  "assemble",
-  "gap-check",
-  "price",
-  "compose",
-  "review",
-  "human-review",
-  "publish",
-  "engage",
-  "close",
-  "aftersale",
-  "remember",
+  "drive-ingest", "perceive", "assemble", "gap-check", "price", "compose",
+  "review", "human-review", "publish", "engage", "close", "aftersale", "remember",
 ];
 const DONE_STAGES = new Set([
-  "perceive",
-  "assemble",
-  "gap-check",
-  "price",
-  "compose",
-  "review",
-  "human-review",
-  "publish",
-  "remember",
+  "perceive", "assemble", "gap-check", "price", "compose", "review",
+  "human-review", "publish", "remember",
 ]);
 
-const MVP_TODOS = [
-  { n: "1–3", label: "M0 Runtime（Loop / Agent / Permission）", done: true },
-  { n: "5–7", label: "M1 感知（ocr ‖ vision + perceive）", done: true },
-  { n: "8–9", label: "M2 組裝（assemble + gap-check）", done: true },
-  { n: "10–12", label: "推理 agents（price / marketing / reviewer）", done: true },
-  { n: "14/16", label: "publisher + memory + product-lifecycle 端到端（fake connector）", done: true },
-  { n: "4", label: "drive connector 實接（需憑證）", done: false },
-  { n: "13/17", label: "Human Review 面板 UI + Observability trace", done: false },
-  { n: "—", label: "Supabase repo 實作（persistence 層）", done: false },
-];
+const STATUS_COLOR: Record<string, string> = {
+  succeeded: "bg-emerald-500/15 text-emerald-300",
+  running: "bg-blue-500/15 text-blue-300",
+  waiting_human: "bg-amber-500/15 text-amber-300",
+  failed: "bg-red-500/15 text-red-300",
+  queued: "bg-zinc-500/15 text-zinc-300",
+  cancelled: "bg-zinc-500/15 text-zinc-400",
+};
 
-function Badge({ done }: { done: boolean }) {
-  return (
-    <span
-      className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
-        done ? "bg-emerald-500/15 text-emerald-300" : "bg-zinc-500/15 text-zinc-400"
-      }`}
-    >
-      {done ? "✓ done" : "待建"}
-    </span>
-  );
+async function fetchLive(): Promise<{ snap: DashboardSnapshot; agentHR: Record<string, boolean> } | null> {
+  const db = getServerDb();
+  if (!db) return null;
+  try {
+    const [snap, agents] = await Promise.all([loadDashboard(db), listAgents(db)]);
+    const agentHR: Record<string, boolean> = {};
+    for (const a of agents) agentHR[a.code] = a.requiresHumanReview;
+    return { snap, agentHR };
+  } catch {
+    return null;
+  }
 }
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const live = await fetchLive();
   const doneAgents = AGENT_CODE.filter((c) => AGENT_META[c]?.done).length;
+
   return (
     <main className="mx-auto max-w-5xl px-6 py-12">
       <header className="mb-10">
-        <p className="text-sm font-medium tracking-widest text-accent">
-          AI BUSINESS OPERATING SYSTEM
-        </p>
+        <p className="text-sm font-medium tracking-widest text-accent">AI BUSINESS OPERATING SYSTEM</p>
         <h1 className="mt-2 text-4xl font-bold">JBG OS</h1>
         <p className="mt-3 max-w-2xl text-zinc-400">
           把「一個人腦中的生意流程」外化成可被 AI Agent 執行、可被人類審核、可被記憶累積、可被觀測的系統。
@@ -80,34 +64,61 @@ export default function DashboardPage() {
         </p>
         <div className="mt-4 flex flex-wrap gap-2 text-xs text-zinc-400">
           <span className="rounded border border-line bg-panel px-2 py-1">Architecture Bible v1.0</span>
-          <span className="rounded border border-line bg-panel px-2 py-1">
-            Agents {doneAgents}/{AGENT_CODE.length}
+          <span className="rounded border border-line bg-panel px-2 py-1">Agents {doneAgents}/{AGENT_CODE.length}</span>
+          <span className="rounded border border-line bg-panel px-2 py-1">39/39 tests ✓</span>
+          <span className={`rounded border px-2 py-1 ${live ? "border-emerald-600/50 bg-emerald-500/10 text-emerald-300" : "border-line bg-panel"}`}>
+            {live ? "● Supabase 已連線" : "○ 靜態（未接 DB）"}
           </span>
-          <span className="rounded border border-line bg-panel px-2 py-1">38/38 tests ✓</span>
         </div>
       </header>
 
-      <Section title="MVP 進度">
-        <ul className="space-y-2">
-          {MVP_TODOS.map((t) => (
-            <li
-              key={t.n}
-              className="flex items-center justify-between rounded-lg border border-line bg-panel/60 px-4 py-2.5"
-            >
-              <span>
-                <span className="mr-2 font-mono text-xs text-zinc-500">Todo {t.n}</span>
-                {t.label}
-              </span>
-              <Badge done={t.done} />
-            </li>
-          ))}
-        </ul>
-      </Section>
+      {live && (
+        <Section title="系統即時狀態（Supabase）">
+          <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <Stat label="商品" value={live.snap.productTotal} />
+            <Stat label="待人審" value={live.snap.pendingReviews} accent={live.snap.pendingReviews > 0} />
+            <Stat label="Loops" value={live.snap.loopCount} />
+            <Stat label="Memories" value={live.snap.memoryCount} />
+          </div>
+          <h3 className="mb-2 text-sm font-medium text-zinc-300">最近的 Loop 執行</h3>
+          {live.snap.executions.length === 0 ? (
+            <p className="rounded-lg border border-line bg-panel/60 px-4 py-3 text-sm text-zinc-500">
+              尚無執行紀錄。跑一次 <code className="text-zinc-400">product-lifecycle</code> 就會出現在這裡。
+            </p>
+          ) : (
+            <div className="overflow-x-auto rounded-lg border border-line">
+              <table className="w-full text-sm">
+                <thead className="bg-panel text-left text-xs text-zinc-500">
+                  <tr>
+                    <th className="px-3 py-2">Loop</th>
+                    <th className="px-3 py-2">狀態</th>
+                    <th className="px-3 py-2">Steps</th>
+                    <th className="px-3 py-2">時間</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {live.snap.executions.map((e) => (
+                    <tr key={e.id} className="border-t border-line/60">
+                      <td className="px-3 py-2 font-mono text-xs text-accent">{e.loopSlug}</td>
+                      <td className="px-3 py-2">
+                        <span className={`rounded px-2 py-0.5 text-xs ${STATUS_COLOR[e.status] ?? "bg-panel"}`}>{e.status}</span>
+                      </td>
+                      <td className="px-3 py-2 text-zinc-400">{e.stepCount}</td>
+                      <td className="px-3 py-2 text-xs text-zinc-500">{new Date(e.createdAt).toLocaleString("zh-TW")}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Section>
+      )}
 
       <Section title="Canonical Agents（§0.6）">
         <div className="grid gap-3 sm:grid-cols-2">
           {AGENT_CODE.map((code) => {
             const m = AGENT_META[code]!;
+            const hr = live?.agentHR[code];
             return (
               <div key={code} className="rounded-lg border border-line bg-panel/60 p-4">
                 <div className="flex items-center justify-between">
@@ -116,6 +127,12 @@ export default function DashboardPage() {
                 </div>
                 <p className="mt-1 font-mono text-xs text-accent">{code}</p>
                 <p className="mt-2 text-sm text-zinc-400">{m.role}</p>
+                {live && (
+                  <p className="mt-2 text-xs text-zinc-500">
+                    需人審：{hr ? <span className="text-amber-300">是</span> : "否"}
+                    <span className="ml-1 text-zinc-600">· 來源 DB</span>
+                  </p>
+                )}
               </div>
             );
           })}
@@ -126,15 +143,7 @@ export default function DashboardPage() {
         <div className="flex flex-wrap items-center gap-2">
           {LIFECYCLE.map((stage, i) => (
             <span key={stage} className="flex items-center gap-2">
-              <code
-                className={`rounded px-2 py-1 text-xs ${
-                  DONE_STAGES.has(stage)
-                    ? "bg-emerald-500/15 text-emerald-300"
-                    : "bg-panel text-zinc-400 border border-line"
-                }`}
-              >
-                {stage}
-              </code>
+              <code className={`rounded px-2 py-1 text-xs ${DONE_STAGES.has(stage) ? "bg-emerald-500/15 text-emerald-300" : "border border-line bg-panel text-zinc-400"}`}>{stage}</code>
               {i < LIFECYCLE.length - 1 && <span className="text-zinc-600">→</span>}
             </span>
           ))}
@@ -143,11 +152,14 @@ export default function DashboardPage() {
 
       <Section title="product_status 狀態機（§0.11，R1）">
         <div className="flex flex-wrap gap-2">
-          {PRODUCT_STATUS.map((s) => (
-            <code key={s} className="rounded border border-line bg-panel px-2 py-1 text-xs text-zinc-300">
-              {s}
-            </code>
-          ))}
+          {PRODUCT_STATUS.map((s) => {
+            const n = live?.snap.productCounts[s];
+            return (
+              <code key={s} className="rounded border border-line bg-panel px-2 py-1 text-xs text-zinc-300">
+                {s}{n ? <span className="ml-1 text-accent">·{n}</span> : null}
+              </code>
+            );
+          })}
         </div>
       </Section>
 
@@ -165,5 +177,22 @@ function Section({ title, children }: { title: string; children: React.ReactNode
       <h2 className="mb-4 text-lg font-semibold text-zinc-200">{title}</h2>
       {children}
     </section>
+  );
+}
+
+function Stat({ label, value, accent }: { label: string; value: number; accent?: boolean }) {
+  return (
+    <div className="rounded-lg border border-line bg-panel/60 p-4">
+      <div className={`text-2xl font-bold ${accent ? "text-amber-300" : "text-zinc-100"}`}>{value}</div>
+      <div className="mt-1 text-xs text-zinc-500">{label}</div>
+    </div>
+  );
+}
+
+function Badge({ done }: { done: boolean }) {
+  return (
+    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${done ? "bg-emerald-500/15 text-emerald-300" : "bg-zinc-500/15 text-zinc-400"}`}>
+      {done ? "✓ done" : "待建"}
+    </span>
   );
 }

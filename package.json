@@ -21,6 +21,8 @@
     "@jbg/db": "workspace:*",
     "@jbg/domain": "workspace:*",
     "@jbg/harness": "workspace:*",
+    "@jbg/persistence": "workspace:*",
+    "@supabase/supabase-js": "^2.45.0",
     "next": "^15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

@@ -17,6 +17,12 @@ importers:
       '@jbg/harness':
         specifier: workspace:*
         version: link:packages/harness
+      '@jbg/persistence':
+        specifier: workspace:*
+        version: link:packages/persistence
+      '@supabase/supabase-js':
+        specifier: ^2.45.0
+        version: 2.110.0
       next:
         specifier: ^15.1.0
         version: 15.5.20(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
