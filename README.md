@@ -58,10 +58,16 @@
 
 Next.js (App Router) + TypeScript + Tailwind/shadcn · Supabase (Postgres + Auth + Storage + pgvector + Edge Functions) · Anthropic Claude (reasoning / vision) · Vercel · Connectors: Google Drive / Facebook / LINE。
 
+## 部署
+
+見 [DEPLOY.md](DEPLOY.md)：Render 一鍵藍圖（`render.yaml` 就緒）+ 接雲端 Supabase / Anthropic 的步驟。已驗證無 env 下可 build/start 並優雅回退靜態。
+
 ## 狀態
 
 - [x] Architecture Bible v1.0（本文件集）
-- [ ] MVP 開發（見 `docs/11` Roadmap、`docs/12` Development Guide）
+- [x] MVP 核心：Loop/Agent/Permission runtime、7 agents、product-lifecycle 端到端（落真 Supabase）
+- [x] UI：Dashboard / Human Review / Loops trace（互動式，可觸發 + 核准 resume）
+- [ ] 接真 connector（Drive/FB/LINE）與真 Anthropic（需憑證）— 見 [DEPLOY.md](DEPLOY.md)
 
 ---
 版本 v1.0 · 2026-07-07
