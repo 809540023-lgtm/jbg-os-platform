@@ -84,7 +84,10 @@ export default async function DashboardPage() {
             <Stat label="Memories" value={live.snap.memoryCount} />
             <Stat label="Loops" value={live.snap.loopCount} />
           </div>
-          <h3 className="mb-2 text-sm font-medium text-zinc-300">最近的 Loop 執行</h3>
+          <h3 className="mb-2 flex items-center justify-between text-sm font-medium text-zinc-300">
+            最近的 Loop 執行
+            <Link href="/loops" className="text-xs text-accent hover:underline">全部 →</Link>
+          </h3>
           {live.snap.executions.length === 0 ? (
             <p className="rounded-lg border border-line bg-panel/60 px-4 py-3 text-sm text-zinc-500">
               尚無執行紀錄。跑一次 <code className="text-zinc-400">product-lifecycle</code> 就會出現在這裡。
@@ -102,8 +105,10 @@ export default async function DashboardPage() {
                 </thead>
                 <tbody>
                   {live.snap.executions.map((e) => (
-                    <tr key={e.id} className="border-t border-line/60">
-                      <td className="px-3 py-2 font-mono text-xs text-accent">{e.loopSlug}</td>
+                    <tr key={e.id} className="border-t border-line/60 hover:bg-panel/40">
+                      <td className="px-3 py-2 font-mono text-xs">
+                        <Link href={`/loops/${e.id}`} className="text-accent hover:underline">{e.loopSlug}</Link>
+                      </td>
                       <td className="px-3 py-2">
                         <span className={`rounded px-2 py-0.5 text-xs ${STATUS_COLOR[e.status] ?? "bg-panel"}`}>{e.status}</span>
                       </td>
