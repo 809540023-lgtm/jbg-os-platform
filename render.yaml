@@ -8,7 +8,10 @@ services:
     region: singapore # 離台灣/日本較近
     plan: free
     branch: main
-    buildCommand: corepack enable && pnpm install --no-frozen-lockfile && pnpm build
+    # --ignore-scripts：Render 的 pnpm 11 會對 esbuild/sharp 的 build script 報
+    # ERR_PNPM_IGNORED_BUILDS（不讀 onlyBuiltDependencies）。本 app 不需這兩者
+    # （esbuild=vitest 專用、sharp=next/image 專用而我們無圖），故直接略過。
+    buildCommand: corepack enable && pnpm install --no-frozen-lockfile --ignore-scripts && pnpm build
     startCommand: pnpm start
     healthCheckPath: /
     autoDeploy: true
