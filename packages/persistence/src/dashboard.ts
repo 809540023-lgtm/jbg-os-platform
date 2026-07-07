@@ -84,11 +84,12 @@ export interface DashboardSnapshot {
   agentCount: number;
   loopCount: number;
   memoryCount: number;
+  agentRunCount: number;
 }
 
 /** 一次抓齊 Dashboard 需要的所有數字。 */
 export async function loadDashboard(db: SupabaseClient): Promise<DashboardSnapshot> {
-  const [executions, productCounts, pendingReviews, agentCount, loopCount, memoryCount] =
+  const [executions, productCounts, pendingReviews, agentCount, loopCount, memoryCount, agentRunCount] =
     await Promise.all([
       listRecentExecutions(db, 8),
       productStatusCounts(db),
@@ -96,7 +97,8 @@ export async function loadDashboard(db: SupabaseClient): Promise<DashboardSnapsh
       countRows(db, "agents"),
       countRows(db, "loops"),
       countRows(db, "memories"),
+      countRows(db, "agent_runs"),
     ]);
   const productTotal = Object.values(productCounts).reduce((a, b) => a + b, 0);
-  return { executions, productCounts, productTotal, pendingReviews, agentCount, loopCount, memoryCount };
+  return { executions, productCounts, productTotal, pendingReviews, agentCount, loopCount, memoryCount, agentRunCount };
 }

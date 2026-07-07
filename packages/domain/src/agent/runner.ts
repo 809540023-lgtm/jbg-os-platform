@@ -62,7 +62,6 @@ export class AgentRunner {
       messages,
       createdAt: startedAt,
     };
-    await this.repos.snapshots.create(snapshot);
 
     const run: AgentRun = {
       id: runId,
@@ -78,7 +77,9 @@ export class AgentRunner {
       attempts: 0,
       startedAt,
     };
+    // 先建 run 再建 snapshot：DB 的 context_snapshots.agent_run_id FK 指向 agent_runs。
     await this.repos.runs.create(run);
+    await this.repos.snapshots.create(snapshot);
 
     try {
       const result = await runModel<O>({

@@ -75,13 +75,14 @@ export default async function DashboardPage() {
 
       {live && (
         <Section title="系統即時狀態（Supabase）">
-          <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-5">
             <Stat label="商品" value={live.snap.productTotal} />
             <Link href="/reviews" className="rounded-lg transition hover:ring-1 hover:ring-amber-500/40">
               <Stat label="待人審 →" value={live.snap.pendingReviews} accent={live.snap.pendingReviews > 0} />
             </Link>
-            <Stat label="Loops" value={live.snap.loopCount} />
+            <Stat label="AI 呼叫" value={live.snap.agentRunCount} />
             <Stat label="Memories" value={live.snap.memoryCount} />
+            <Stat label="Loops" value={live.snap.loopCount} />
           </div>
           <h3 className="mb-2 text-sm font-medium text-zinc-300">最近的 Loop 執行</h3>
           {live.snap.executions.length === 0 ? (

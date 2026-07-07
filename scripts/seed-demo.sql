@@ -36,3 +36,8 @@ insert into human_reviews (target_kind, target_id, status) values
 insert into memories (slug, type, title, content) values
   ('chanel-classic-flap-caviar-60k','fact','Chanel 成交參考','Chanel Classic Flap caviar 成交參考約 NT$60,000。')
 on conflict (slug) do nothing;
+
+-- demo agent_runs（cost_amount 為 micro-USD）
+insert into agent_runs (agent_id, status, model, input, output, input_tokens, output_tokens, cost_amount, started_at, finished_at)
+select id, 'succeeded', 'demo', '{}', '{}', 120, 30, 270, now()-interval '19 min', now()-interval '19 min'
+from agents where code in ('ocr','vision','price','marketing');
