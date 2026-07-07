@@ -10,7 +10,7 @@ import {
   productLifecycleLoop,
   type ProductPhoto,
 } from "@jbg/domain";
-import type { ModelClient, ModelRequest } from "@jbg/harness";
+import { AnthropicModelClient, MODEL_PRICING, type ModelClient, type ModelRequest } from "@jbg/harness";
 import {
   SupabaseLoopExecutionRepo,
   SupabaseLoopStepRepo,
@@ -53,8 +53,16 @@ export function buildLifecycleRuntime(db: SupabaseClient) {
   const facebook = new InMemoryFacebookConnector();
   const policy = new PolicyEngine({ rules: defaultMvpRules(), defaultEffect: "deny" });
 
+  // 有 ANTHROPIC_API_KEY → 真 Claude；否則 fake（demo 不需 key 也能跑）。
+  const realClient = AnthropicModelClient.fromEnv();
+
   function makeRunner(memorySlug: string) {
-    const agentRunner = new AgentRunner({ client: makeFakeClient(memorySlug), repos: createSupabaseAgentRepos(db) });
+    const client = realClient ?? makeFakeClient(memorySlug);
+    const agentRunner = new AgentRunner({
+      client,
+      repos: createSupabaseAgentRepos(db),
+      pricing: realClient ? MODEL_PRICING : undefined,
+    });
     const executor = buildLifecycleExecutor({
       agentRunner, policy, facebook,
       actor: agentActor(asId("00000000-0000-0000-0000-0000000000a1"), "publisher"),

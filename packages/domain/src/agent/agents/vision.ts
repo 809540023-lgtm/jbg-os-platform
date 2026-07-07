@@ -25,17 +25,23 @@ export const visionAgent: AgentDef<VisionInput, VisionResult> = {
     "- 嚴禁：估價、寫文案、猜測看不到的資訊。",
     "輸出：嚴格符合 VisionResult JSON schema，不要多餘欄位。",
   ].join("\n"),
-  buildMessages: (input) => [
-    {
-      role: "user",
-      content: [
-        `商品照片: ${input.imageUrl}`,
-        `knownBrands: ${JSON.stringify(input.knownBrands)}`,
-        `knownCategories: ${JSON.stringify(input.knownCategories)}`,
-        "請回傳 VisionResult JSON。",
-      ].join("\n"),
-    },
-  ],
+  buildMessages: (input) => {
+    const text = [
+      `knownBrands: ${JSON.stringify(input.knownBrands)}`,
+      `knownCategories: ${JSON.stringify(input.knownCategories)}`,
+      "請回傳 VisionResult JSON。",
+    ].join("\n");
+    // 真實 http(s) 圖片 → 送 image content block 讓 Claude 看得到；否則退回純文字（fake/本地）。
+    const isUrl = /^https?:\/\//.test(input.imageUrl);
+    return [
+      {
+        role: "user",
+        content: isUrl
+          ? [{ type: "image", source: { type: "url", url: input.imageUrl } }, { type: "text", text }]
+          : `商品照片: ${input.imageUrl}\n${text}`,
+      },
+    ];
+  },
   outputSchema: visionResultSchema,
   // 低信心或品牌用猜的 → 升級（開 Task 補件或 HR）。
   requiresHumanReview: (out) =>

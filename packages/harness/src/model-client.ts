@@ -4,9 +4,15 @@
  * 這讓 harness / agent runtime 在無 API key 下可被單元測試。
  */
 
+/** 內容區塊 —— 純文字或圖片（vision agent 用）。 */
+export type ModelContentBlock =
+  | { type: "text"; text: string }
+  | { type: "image"; source: { type: "url"; url: string } | { type: "base64"; mediaType: string; data: string } };
+
 export interface ModelMessage {
   role: "user" | "assistant";
-  content: string;
+  /** 字串為純文字；陣列可含圖片區塊（多模態）。 */
+  content: string | ModelContentBlock[];
 }
 
 export interface ModelRequest {

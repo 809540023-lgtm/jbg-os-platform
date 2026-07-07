@@ -52,14 +52,18 @@
 
 ## 階段 C · 接真 Anthropic（要 agent 跑真模型才需要）
 
-目前 `/loops` 的「觸發」按鈕用 **fake agent**（見 `app/lib/lifecycle-runtime.ts`），
-不需 API key 就能跑完整流程。要換成真 Claude：
+`AnthropicModelClient` 已實作（`@jbg/harness`，實 `ModelClient` 介面、支援 image content block、
+不送 temperature 以相容 Sonnet 5 / Opus 4.8）。`app/lib/lifecycle-runtime.ts` 會在偵測到
+`ANTHROPIC_API_KEY` 時**自動**改用真 Claude，否則用 fake（demo 不需 key）。**只要設 key 即可**：
 
-1. Render 環境變數加 `ANTHROPIC_API_KEY`
-2. 實作一個 `AnthropicModelClient`（實 `@jbg/harness` 的 `ModelClient` 介面），
-   把 `app/lib/lifecycle-runtime.ts` 的 `makeFakeClient` 換掉
-3. Vision agent 需要 harness 支援 image content block（目前 `ModelClient` 為純文字）
-   —— 見 `docs/appendix/H` 與 `claude-api` skill 的模型 id / 定價
+1. 本機：在 `.env.local` 加 `ANTHROPIC_API_KEY=sk-ant-...`
+2. Render：service → Environment 加 `ANTHROPIC_API_KEY`，redeploy
+3. 之後 `/loops` 的「觸發」按鈕就跑真 7 個 agent（vision 送 image block、cost 記進 `agent_runs`）
+
+> 模型 id 走 `packages/harness/src/models.ts` 的 `MODELS.*`（預設 Sonnet 5 / Haiku 4.5）；
+> 定價表在 `anthropic-client.ts` 的 `MODEL_PRICING`（上線前用 `claude-api` skill 覆核當前定價）。
+> Vision 要真的「看到」照片，需要真實 http(s) 圖片 URL（來自 Google Drive connector，Todo 4）；
+> 目前 demo 用假路徑，vision 會退回純文字描述。
 
 ---
 
