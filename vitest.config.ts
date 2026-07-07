@@ -18,6 +18,7 @@ export default defineConfig({
       "@jbg/skills": r("./packages/skills/src/index.ts"),
       "@jbg/connectors": r("./packages/connectors/src/index.ts"),
       "@jbg/eval": r("./packages/eval/src/index.ts"),
+      "@jbg/persistence": r("./packages/persistence/src/index.ts"),
     },
   },
 });

@@ -10,7 +10,7 @@ insert into actors (kind, agent_code, display_name) values
   ('agent', 'reviewer',  'Reviewer Agent'),
   ('agent', 'publisher', 'Publisher Agent'),
   ('agent', 'memory',    'Memory Agent')
-on conflict (agent_code) do nothing;
+on conflict (agent_code) where agent_code is not null do nothing;
 
 insert into actors (kind, display_name)
 select 'system', 'System'

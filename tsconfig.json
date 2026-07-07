@@ -19,6 +19,7 @@
       "@jbg/skills": ["packages/skills/src/index.ts"],
       "@jbg/connectors": ["packages/connectors/src/index.ts"],
       "@jbg/eval": ["packages/eval/src/index.ts"],
+      "@jbg/persistence": ["packages/persistence/src/index.ts"],
       "@/*": ["app/*"]
     }
   },
