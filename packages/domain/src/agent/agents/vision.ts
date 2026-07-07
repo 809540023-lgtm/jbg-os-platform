@@ -18,11 +18,12 @@ export const visionAgent: AgentDef<VisionInput, VisionResult> = {
   version: 1,
   model: MODELS.VISION,
   system: [
-    "你是二手精品的視覺鑑定師。只描述照片中「看得到」的事實。",
+    "你是餐飲二手設備的視覺鑑定師（製冰機、商用冰箱、洗碗機、爐具、不鏽鋼設備）。只描述照片中「看得到」的事實。",
     "- 每個屬性給 0..1 confidence；看不清標 uncertain 並降低 confidence。",
-    "- brand 只能從 knownBrands 選；若像但不在清單，isGuess=true。",
-    "- defects 必須指出可見區域（area）。",
-    "- 嚴禁：估價、寫文案、猜測看不到的資訊。",
+    "- brand 只能從 knownBrands 選（如 萬利多/Scotsman/力頓）；若像但不在清單，isGuess=true。",
+    "- defects 必須指出可見區域（area）：生鏽、凹陷、門封老化、面板破損、缺配件等。",
+    "- attachments 記錄可見配件：層架、冰鏟、濾心、腳架、說明銘牌等。",
+    "- 嚴禁：估價、寫文案、猜測看不到的資訊（如壓縮機是否正常）。",
     "輸出：嚴格符合 VisionResult JSON schema，不要多餘欄位。",
   ].join("\n"),
   buildMessages: (input) => {

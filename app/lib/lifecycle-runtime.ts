@@ -28,11 +28,11 @@ import { buildLifecycleExecutor, type LifecycleInput } from "@jbg/skills";
  */
 
 const RESP: { match: string; json: unknown }[] = [
-  { match: "視覺鑑定師", json: { brand: { value: "Chanel", confidence: 0.9, isGuess: false }, category: { value: "handbag", confidence: 0.9 }, colors: [{ name: "black", confidence: 0.9 }], attachments: ["dust bag"], defects: [{ type: "scratch", area: "corner", severity: "minor", confidence: 0.5 }], overallConfidence: 0.9, notes: null } },
-  { match: "OCR 抽取器", json: { rawText: "caviar", fields: { model: { value: "Classic Flap", confidence: 0.8 }, serial: { value: "12345678", confidence: 0.8 }, size: { value: null, confidence: 0 }, material: { value: "caviar", confidence: 0.9 } }, language: "en", lowConfidence: false } },
-  { match: "定價分析師", json: { productId: "x", suggestedAmount: 60000, minAmount: 50000, maxAmount: 70000, currency: "TWD", reasons: ["品牌保值", "成色佳"], confidence: 0.8, requiresHumanReview: false } },
-  { match: "社群文案", json: { productId: "x", title: "Chanel 經典口蓋包", body: "九成新，附防塵袋。", sellingPoints: ["caviar 皮革"], hashtags: ["#chanel"], complianceFlags: [], requiresHumanReview: true } },
-  { match: "上架前品管", json: { productId: "x", decision: "pass", checks: [{ name: "completeness", status: "pass", reason: "齊全" }] } },
+  { match: "視覺鑑定師", json: { brand: { value: "萬利多", confidence: 0.9, isGuess: false }, category: { value: "製冰機", confidence: 0.9 }, colors: [{ name: "不鏽鋼銀", confidence: 0.9 }], attachments: ["冰鏟", "濾心"], defects: [{ type: "刮痕", area: "左側面板", severity: "minor", confidence: 0.6 }], overallConfidence: 0.9, notes: null } },
+  { match: "OCR 抽取器", json: { rawText: "MANITOWOC IY-0504A 220V", fields: { model: { value: "IY-0504A", confidence: 0.85 }, serial: { value: "MT20230815", confidence: 0.8 }, size: { value: "500LB/日 220V", confidence: 0.8 }, material: { value: "不鏽鋼", confidence: 0.9 } }, language: "en", lowConfidence: false } },
+  { match: "定價分析師", json: { productId: "x", suggestedAmount: 45000, minAmount: 38000, maxAmount: 52000, currency: "TWD", reasons: ["萬利多零件流通性高", "九成新僅面板輕微刮痕"], confidence: 0.8, requiresHumanReview: false } },
+  { match: "社群文案", json: { productId: "x", title: "二手 萬利多 500磅 製冰機 台北｜保固三個月", body: "萬利多 IY-0504A，日產能 500 磅，220V。九成新、水路已清洗除垢。可驗收：製冰量、排水、噪音。附保固、可到府安裝，比買新省約 55%。", sellingPoints: ["500磅日產能", "水路除垢完成"], hashtags: ["#開店設備", "#二手製冰機"], complianceFlags: [], requiresHumanReview: true } },
+  { match: "上架前品管", json: { productId: "x", decision: "pass", checks: [{ name: "completeness", status: "pass", reason: "規格、成色、可驗收項齊全" }] } },
   { match: "記憶萃取器", json: { memories: [] } },
 ];
 
@@ -42,7 +42,7 @@ function makeFakeClient(memorySlug: string): ModelClient {
       const hit = RESP.find((r) => req.system?.includes(r.match));
       let json = hit?.json ?? {};
       if (req.system?.includes("記憶萃取器")) {
-        json = { memories: [{ slug: memorySlug, kind: "fact", content: "Chanel Classic Flap caviar 成交約 NT$60,000。", links: [], sourceRef: { type: "order", id: "44444444-4444-4444-4444-444444444444" }, confidence: 0.7 }] };
+        json = { memories: [{ slug: memorySlug, kind: "fact", content: "萬利多 500 磅製冰機（九成新）台北成交參考約 NT$45,000。", links: [], sourceRef: { type: "order", id: "44444444-4444-4444-4444-444444444444" }, confidence: 0.7 }] };
       }
       return { text: JSON.stringify(json), usage: { inputTokens: 40, outputTokens: 20 } };
     },
@@ -91,7 +91,7 @@ export function buildLifecycleRuntime(db: SupabaseClient) {
       const input: LifecycleInput = {
         driveFileId, photo,
         ocr: { photoId: photo.id, imageUrl: photo.storagePath },
-        vision: { photoId: photo.id, imageUrl: photo.storagePath, knownBrands: ["Chanel"], knownCategories: ["handbag"] },
+        vision: { photoId: photo.id, imageUrl: photo.storagePath, knownBrands: ["萬利多", "Scotsman", "力頓"], knownCategories: ["製冰機", "商用冰箱", "洗碗機", "爐具"] },
       };
       const runner = makeRunner(`demo-mem-${driveFileId.slice(0, 8)}`);
       const ex = await runner.run(productLifecycleLoop, input);
