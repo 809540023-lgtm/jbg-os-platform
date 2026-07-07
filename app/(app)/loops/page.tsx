@@ -1,6 +1,7 @@
 import { listRecentExecutions, type ExecutionSummary } from "@jbg/persistence";
 import Link from "next/link";
 import { getServerDb } from "@/lib/server-db";
+import { triggerDemoRunAction } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +22,16 @@ export default async function LoopsPage() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
       <Link href="/" className="text-xs text-accent hover:underline">← Dashboard</Link>
-      <h1 className="mt-2 mb-6 text-3xl font-bold">Loop 執行</h1>
+      <div className="mt-2 mb-6 flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Loop 執行</h1>
+        {db && (
+          <form action={triggerDemoRunAction}>
+            <button className="rounded-md bg-accent/15 px-3 py-2 text-sm font-medium text-accent hover:bg-accent/25">
+              ▶ 觸發一次 demo lifecycle
+            </button>
+          </form>
+        )}
+      </div>
       {!db && <p className="text-sm text-zinc-500">未接 Supabase。</p>}
       {db && rows.length === 0 && (
         <p className="rounded-lg border border-line bg-panel/60 px-4 py-6 text-center text-sm text-zinc-500">尚無執行紀錄。</p>
