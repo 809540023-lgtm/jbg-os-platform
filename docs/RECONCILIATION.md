@@ -11,8 +11,12 @@
 
 ## R5 · domain/docs Entity 與 migration 欄位不符（接 Supabase 時發現）
 - **衝突**：(a) `docs/05` Product 與 `@jbg/domain` 的 catalog `Product` 有 `sku`，但 migration 的 `products` 表**無 `sku` 欄**（有 `brand_id/category_id/title/condition/attributes/status/price_amount…`）。(b) `docs/07` Memory 用 `kind`，但 migration `memories` 表用 `type` + `source_kind/source_id`（非 `kind`/`links`/`sourceRef`）。
-- **暫採**：Loop/Agent 持久化不受影響（已測綠）。products/memories 的 Supabase repo **尚未建**；demo 資料以 migration 實際欄位插入。
-- **建議定案（待裁決）**：以 migration（DB 真值）為準，回頭把 `@jbg/domain` 的 `Product`（拿掉 sku 或改 DB 補 sku）與 memory 型別對齊 migration；或改 migration 補欄。**建立 products/memories repo 前需先定案**，否則 mapping 會卡住。
+- **決策（2026-07-07 定案：以 DB 為準）**：
+  - `Product` 拿掉 `sku`（domain 已改）。
+  - `products` 補 additive 欄 `primary_photo_id` / `missing_fields`（migration `..._091300`）。
+  - Memory 保留 agent 契約（`MemoryDraft`：kind/links/sourceRef），由 `SupabaseMemoryRepo` 映射 → `memories`（type/source_kind/source_id）。`links` 對應 `memory_links` 表，MVP 先略（TODO）。
+  - `source_id` 為 uuid、`primary_photo_id` 為 uuid、`brand_id/category_id` 為 FK → repo/呼叫端須傳合法 uuid 與已存在的 FK。
+- **已落地**：`SupabaseProductRepo` / `SupabaseMemoryRepo` 建好，整條 `product-lifecycle` 端到端落真 DB 並測綠（`tests/integration/lifecycle-persistence.test.ts`）。
 
 ---
-狀態：R1–R4 已定案回填；**R5 待裁決**（不阻塞目前已完成部分，但阻塞 products/memories 的 DB repo）。
+狀態：**R1–R5 全數定案回填**。無未決項。後續若再發現衝突，於此表新增一列。

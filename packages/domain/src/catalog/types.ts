@@ -69,7 +69,6 @@ export interface ProductPhoto extends AuditFields {
 
 export interface Product extends AuditFields {
   readonly id: ProductId;
-  readonly sku: string;
   status: ProductStatus;
   title: string | null;
   description: string | null;

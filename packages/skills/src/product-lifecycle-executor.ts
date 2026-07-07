@@ -11,11 +11,13 @@ import {
   type Brand,
   type Category,
   type MarketingDraft,
+  type MemoryRepo,
   type OCRInput,
   type PerceiveResult,
   type PolicyEngine,
   type Product,
   type ProductPhoto,
+  type ProductRepo,
   type PublishInput,
   type StepExecutor,
   type VisionInput,
@@ -43,6 +45,10 @@ export interface LifecycleDeps {
   categories: Category[];
   currency?: string;
   now?: () => string;
+  /** 提供則把 Product 落 DB（assemble 後）。 */
+  productRepo?: ProductRepo;
+  /** 提供則把萃取的 Memory 落 DB（remember 後）。 */
+  memoryRepo?: MemoryRepo;
 }
 
 export function buildLifecycleExecutor(deps: LifecycleDeps): StepExecutor {
@@ -69,6 +75,7 @@ export function buildLifecycleExecutor(deps: LifecycleDeps): StepExecutor {
           categories: deps.categories,
           now: now(),
         });
+        if (deps.productRepo) await deps.productRepo.create(product);
         return { output: { product } };
       }
 
@@ -148,6 +155,9 @@ export function buildLifecycleExecutor(deps: LifecycleDeps): StepExecutor {
           sourceId: product.id,
           payload: { productId: product.id, amount: price.suggestedAmount, currency: price.currency },
         });
+        if (deps.memoryRepo) {
+          for (const m of out.output.memories) await deps.memoryRepo.save(m);
+        }
         return { output: out.output };
       }
 

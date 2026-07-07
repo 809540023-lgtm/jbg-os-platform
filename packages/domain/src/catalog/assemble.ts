@@ -38,7 +38,6 @@ export interface AssembleInput {
   categories: Category[];
   now: string;
   newProductId?: () => ProductId;
-  sku?: string;
 }
 
 function matchBrand(name: string | null, brands: Brand[]): BrandId | null {
@@ -111,7 +110,6 @@ export function assembleFrom(input: AssembleInput): AssembleOutput {
 
   const product: Product = {
     id,
-    sku: input.sku ?? `sku-${id.slice(0, 8)}`,
     status: "assembled",
     title: null,
     description: null,
