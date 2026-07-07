@@ -1,5 +1,6 @@
 import { AGENT_CODE, PRODUCT_STATUS } from "@jbg/db";
 import { listAgents, loadDashboard, type DashboardSnapshot } from "@jbg/persistence";
+import Link from "next/link";
 import { getServerDb } from "./lib/server-db";
 
 export const dynamic = "force-dynamic";
@@ -76,7 +77,9 @@ export default async function DashboardPage() {
         <Section title="系統即時狀態（Supabase）">
           <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
             <Stat label="商品" value={live.snap.productTotal} />
-            <Stat label="待人審" value={live.snap.pendingReviews} accent={live.snap.pendingReviews > 0} />
+            <Link href="/reviews" className="rounded-lg transition hover:ring-1 hover:ring-amber-500/40">
+              <Stat label="待人審 →" value={live.snap.pendingReviews} accent={live.snap.pendingReviews > 0} />
+            </Link>
             <Stat label="Loops" value={live.snap.loopCount} />
             <Stat label="Memories" value={live.snap.memoryCount} />
           </div>
