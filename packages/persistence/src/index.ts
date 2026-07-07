@@ -4,4 +4,5 @@ export * from "./product-repo";
 export * from "./memory-repo";
 export * from "./agent-repo";
 export * from "./review-repo";
+export * from "./catalog-read";
 export * from "./dashboard";
