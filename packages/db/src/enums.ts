@@ -54,7 +54,7 @@ export type AgentRunStatus = (typeof AGENT_RUN_STATUS)[number];
 export const ACTOR_KIND = ["human", "agent", "system"] as const;
 export type ActorKind = (typeof ACTOR_KIND)[number];
 
-/** Canonical Agent 代號 —— docs/00 §0.6。 */
+/** Canonical Agent 代號 —— docs/00 §0.6（v1.1 加入 inquiry 客服）。 */
 export const AGENT_CODE = [
   "vision",
   "ocr",
@@ -63,6 +63,7 @@ export const AGENT_CODE = [
   "reviewer",
   "publisher",
   "memory",
+  "inquiry",
 ] as const;
 export type AgentCode = (typeof AGENT_CODE)[number];
 

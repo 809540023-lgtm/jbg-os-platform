@@ -154,6 +154,9 @@
 | **Reviewer Agent** | `reviewer` | 品管：檢查商品卡完整性、文案合規、價格合理性，決定放行或退回 | 商品卡草稿 | pass / reject + 理由 | — （它本身是自動審） |
 | **Publisher Agent** | `publisher` | 發佈：把通過的 Listing 送上 FB、記錄結果 | approved `Listing` | FB post + `Listing.published` | 否（但受 Permission 管） |
 | **Memory Agent** | `memory` | 記憶：從成交/詢問/售後萃取可重用事實並寫入 Memory | events | `Memory` records | 否 |
+| **Inquiry Agent** | `inquiry` | 客服：讀商品卡＋買家詢問，草擬回覆、判斷是否可自動答 | `Inquiry`+`Product` | 回覆草稿＋信心 | 是（回覆客戶＝不可逆動作，見守則#4；議價/客訴/承諾一律 HR） |
+
+> **Inquiry Agent（第 8 個，v1.1 擴充）**：源自「平台規劃書-二手」的 AI 客服需求。與其他 Agent 一樣**只產出主張不執行**——它只草擬回覆，實際送出給客戶是不可逆動作，一律經 Human Review（守則#4）。低風險、高信心的常見問題（規格、現貨、地區）可由 Policy 開放自動放行；議價、客訴、到府/保固承諾強制人審。
 
 **Human Review** 不是 Agent，是**關卡**：由 `Reviewer Agent` 或 Policy 觸發，交給人類在 UI 上 approve/reject/edit。詳見 `docs/07` §Human Review 與附錄 K。
 

@@ -68,6 +68,7 @@ export default async function DashboardPage() {
           <span className="rounded border border-line bg-panel px-2 py-1">Agents {doneAgents}/{AGENT_CODE.length}</span>
           <span className="rounded border border-line bg-panel px-2 py-1">39/39 tests ✓</span>
           <Link href="/p" className="rounded border border-accent/50 bg-accent/10 px-2 py-1 text-accent hover:bg-accent/20">餐飲二手設備目錄 →</Link>
+          <Link href="/inquiries" className="rounded border border-line bg-panel px-2 py-1 hover:border-accent/50">AI 客服 →</Link>
           <span className={`rounded border px-2 py-1 ${live ? "border-emerald-600/50 bg-emerald-500/10 text-emerald-300" : "border-line bg-panel"}`}>
             {live ? "● Supabase 已連線" : "○ 靜態（未接 DB）"}
           </span>

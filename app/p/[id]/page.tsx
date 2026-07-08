@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getServerDb } from "@/lib/server-db";
 import { SITE_NAME, SITE_URL, conditionLabel, formatPrice } from "@/lib/site";
+import { InquiryForm } from "./inquiry-form";
 
 export const dynamic = "force-dynamic";
 
@@ -121,6 +122,8 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           <span className="rounded border border-line bg-panel px-2 py-1">✓ 附驗收報告</span>
         </div>
       </div>
+
+      <InquiryForm productId={p.id} />
 
       <p className="mt-6 text-center text-xs text-zinc-600">
         {SITE_NAME} · 由 JBG OS 自動整備上架
