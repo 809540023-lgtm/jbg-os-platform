@@ -17,6 +17,7 @@ const AGENT_META: Record<string, { name: string; role: string; done: boolean }> 
   reviewer: { name: "Reviewer", role: "自動品管：pass/reject", done: true },
   publisher: { name: "Publisher", role: "發佈到 FB（過 Policy + connector）", done: true },
   memory: { name: "Memory", role: "從成交萃取記憶", done: true },
+  inquiry: { name: "Inquiry", role: "AI 客服：草擬詢問回覆（送出過人審）", done: true },
 };
 
 const LIFECYCLE = [
@@ -25,7 +26,7 @@ const LIFECYCLE = [
 ];
 const DONE_STAGES = new Set([
   "perceive", "assemble", "gap-check", "price", "compose", "review",
-  "human-review", "publish", "remember",
+  "human-review", "publish", "engage", "remember",
 ]);
 
 const STATUS_COLOR: Record<string, string> = {
@@ -128,7 +129,7 @@ export default async function DashboardPage() {
       <Section title="Canonical Agents（§0.6）">
         <div className="grid gap-3 sm:grid-cols-2">
           {AGENT_CODE.map((code) => {
-            const m = AGENT_META[code]!;
+            const m = AGENT_META[code] ?? { name: code, role: "", done: false };
             const hr = live?.agentHR[code];
             return (
               <div key={code} className="rounded-lg border border-line bg-panel/60 p-4">
