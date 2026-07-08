@@ -102,3 +102,64 @@ export async function loadDashboard(db: SupabaseClient): Promise<DashboardSnapsh
   const productTotal = Object.values(productCounts).reduce((a, b) => a + b, 0);
   return { executions, productCounts, productTotal, pendingReviews, agentCount, loopCount, memoryCount, agentRunCount };
 }
+
+/** 營運數據儀表板（規劃書 §6.3 每週儀表板）—— DB 可算的營運面指標。 */
+export interface AnalyticsSnapshot {
+  productCounts: Record<string, number>;
+  productTotal: number;
+  publishedCount: number;
+  inquiryTotal: number;
+  inquiryOpen: number;
+  inquiryAnswered: number;
+  inquiryAutoReplyable: number; // ai_requires_human = false
+  inquiryAutoReplyRate: number; // 0..1
+  pendingReviews: number;
+  agentRunCount: number;
+  agentCostUsd: number; // 由 micro-USD 換算
+  memoryCount: number;
+  orderCount: number;
+  escrowHeldCount: number;
+}
+
+export async function loadAnalytics(db: SupabaseClient): Promise<AnalyticsSnapshot> {
+  const [productCounts, inquiries, pendingReviews, agentRunCount, memoryCount, orderCount, escrowHeldCount, costRows] =
+    await Promise.all([
+      productStatusCounts(db),
+      db.from("inquiries").select("status, ai_requires_human"),
+      countRows(db, "human_reviews", { column: "status", value: "pending" }),
+      countRows(db, "agent_runs"),
+      countRows(db, "memories"),
+      countRows(db, "orders"),
+      countRows(db, "orders", { column: "escrow_status", value: "funds_held" }),
+      db.from("agent_runs").select("cost_amount"),
+    ]);
+
+  const inqRows = (inquiries.data ?? []) as { status: string; ai_requires_human: boolean | null }[];
+  const inquiryTotal = inqRows.length;
+  const inquiryOpen = inqRows.filter((r) => r.status === "new" || r.status === "in_progress").length;
+  const inquiryAnswered = inqRows.filter((r) => r.status === "answered" || r.status === "converted").length;
+  const inquiryAutoReplyable = inqRows.filter((r) => r.ai_requires_human === false).length;
+
+  const costMicroUsd = ((costRows.data ?? []) as { cost_amount: number | null }[]).reduce(
+    (a, r) => a + (r.cost_amount ?? 0),
+    0,
+  );
+
+  const productTotal = Object.values(productCounts).reduce((a, b) => a + b, 0);
+  return {
+    productCounts,
+    productTotal,
+    publishedCount: productCounts.published ?? 0,
+    inquiryTotal,
+    inquiryOpen,
+    inquiryAnswered,
+    inquiryAutoReplyable,
+    inquiryAutoReplyRate: inquiryTotal > 0 ? inquiryAutoReplyable / inquiryTotal : 0,
+    pendingReviews,
+    agentRunCount,
+    agentCostUsd: costMicroUsd / 1_000_000,
+    memoryCount,
+    orderCount,
+    escrowHeldCount,
+  };
+}

@@ -9,6 +9,9 @@ export interface PendingReview {
   reason: string | null;
   loopExecutionId: string | null;
   createdAt: string;
+  confidence: number | null;
+  amount: number | null;
+  currency: string | null;
 }
 
 export async function listPendingReviews(
@@ -17,7 +20,7 @@ export async function listPendingReviews(
 ): Promise<PendingReview[]> {
   const { data, error } = await db
     .from("human_reviews")
-    .select("id, target_kind, target_id, reason, loop_execution_id, created_at")
+    .select("id, target_kind, target_id, reason, loop_execution_id, created_at, confidence, amount, currency")
     .eq("status", "pending")
     .order("created_at", { ascending: true })
     .limit(limit);
@@ -29,6 +32,9 @@ export async function listPendingReviews(
     reason: string | null;
     loop_execution_id: string | null;
     created_at: string;
+    confidence: number | null;
+    amount: number | null;
+    currency: string | null;
   };
   return ((data ?? []) as Row[]).map((r) => ({
     id: r.id,
@@ -37,6 +43,9 @@ export async function listPendingReviews(
     reason: r.reason,
     loopExecutionId: r.loop_execution_id,
     createdAt: r.created_at,
+    confidence: r.confidence,
+    amount: r.amount,
+    currency: r.currency,
   }));
 }
 

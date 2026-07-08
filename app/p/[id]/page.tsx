@@ -1,7 +1,8 @@
-import { getCatalogProduct, type CatalogProduct } from "@jbg/persistence";
+import { getCatalogProduct, listPublishedProducts, type CatalogProduct } from "@jbg/persistence";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { recommend } from "@/lib/recommend";
 import { getServerDb } from "@/lib/server-db";
 import { SITE_NAME, SITE_URL, conditionLabel, formatPrice } from "@/lib/site";
 import { InquiryForm } from "./inquiry-form";
@@ -64,10 +65,26 @@ function productJsonLd(p: CatalogProduct): string {
   return JSON.stringify(ld);
 }
 
+function RecoCard({ p }: { p: CatalogProduct }) {
+  return (
+    <Link
+      href={`/p/${p.id}`}
+      className="rounded-lg border border-line bg-panel/60 p-3 transition hover:border-accent/50"
+    >
+      <h3 className="line-clamp-2 text-sm font-medium leading-snug">{p.title}</h3>
+      <p className="mt-1 text-sm font-bold text-accent">{formatPrice(p.priceAmount, p.priceCurrency)}</p>
+    </Link>
+  );
+}
+
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const p = await load(id);
   if (!p) notFound();
+
+  const db = getServerDb();
+  const allPublished = db ? await listPublishedProducts(db) : [];
+  const reco = recommend(p, allPublished);
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
@@ -125,7 +142,28 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
 
       <InquiryForm productId={p.id} />
 
-      <p className="mt-6 text-center text-xs text-zinc-600">
+      {/* 智能推薦：開店整套（規劃書 §2.2 提高客單） */}
+      {reco.bundle.length > 0 && (
+        <section className="mt-8">
+          <h2 className="text-lg font-semibold">開店這樣配 🍳</h2>
+          <p className="mt-1 text-xs text-zinc-500">整套採購一次搞定，同區配送、可談整套優惠。</p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-3">
+            {reco.bundle.map((r) => <RecoCard key={r.id} p={r} />)}
+          </div>
+        </section>
+      )}
+
+      {/* 類似設備 */}
+      {reco.similar.length > 0 && (
+        <section className="mt-8">
+          <h2 className="text-lg font-semibold">類似設備</h2>
+          <div className="mt-3 grid gap-3 sm:grid-cols-3">
+            {reco.similar.map((r) => <RecoCard key={r.id} p={r} />)}
+          </div>
+        </section>
+      )}
+
+      <p className="mt-8 text-center text-xs text-zinc-600">
         {SITE_NAME} · 由 JBG OS 自動整備上架
       </p>
     </main>

@@ -1,7 +1,9 @@
+import { triageReview } from "@jbg/domain";
 import { listPendingReviews, type PendingReview } from "@jbg/persistence";
 import Link from "next/link";
 import { getServerDb } from "@/lib/server-db";
-import { decideReviewAction } from "./actions";
+import { formatPrice } from "@/lib/site";
+import { bulkAutoPassAction, decideReviewAction } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +14,13 @@ export const dynamic = "force-dynamic";
 export default async function ReviewsPage() {
   const db = getServerDb();
   const reviews: PendingReview[] = db ? await listPendingReviews(db) : [];
+
+  // 智能分流：每筆給建議（規劃書 §5.2）
+  const triaged = reviews.map((r) => ({
+    r,
+    t: triageReview({ targetKind: r.targetKind, confidence: r.confidence, amount: r.amount }),
+  }));
+  const autoPassCount = triaged.filter((x) => x.t.recommendation === "auto_pass").length;
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
@@ -40,20 +49,44 @@ export default async function ReviewsPage() {
         </p>
       )}
 
+      {/* 智能分流摘要 + 一鍵放行（規劃書 §5.2：消化瓶頸） */}
+      {autoPassCount > 0 && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-4 py-3">
+          <p className="text-sm text-emerald-200">
+            🤖 智能分流：<b>{autoPassCount}</b> 筆為高信心低風險，建議自動放行；其餘 {reviews.length - autoPassCount} 筆需人工判斷。
+          </p>
+          <form action={bulkAutoPassAction}>
+            <button className="rounded-md bg-emerald-500/20 px-3 py-1.5 text-sm font-medium text-emerald-200 hover:bg-emerald-500/30">
+              一鍵放行 {autoPassCount} 筆
+            </button>
+          </form>
+        </div>
+      )}
+
       <ul className="space-y-3">
-        {reviews.map((r) => (
+        {triaged.map(({ r, t }) => (
           <li key={r.id} className="rounded-lg border border-line bg-panel/60 p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="rounded bg-accent/15 px-2 py-0.5 font-mono text-xs text-accent">
                     {r.targetKind}
                   </span>
-                  <span className="font-mono text-xs text-zinc-500">{r.targetId.slice(0, 8)}…</span>
+                  {t.recommendation === "auto_pass" ? (
+                    <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-medium text-emerald-300">建議自動放行</span>
+                  ) : (
+                    <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-medium text-amber-300">需人工判斷</span>
+                  )}
+                  {r.confidence != null && (
+                    <span className="text-xs text-zinc-500">信心 {Math.round(r.confidence * 100)}%</span>
+                  )}
+                  {r.amount != null && (
+                    <span className="text-xs text-zinc-500">{formatPrice(r.amount, r.currency)}</span>
+                  )}
                 </div>
                 <p className="mt-2 text-sm text-zinc-300">{r.reason ?? "（無說明）"}</p>
                 <p className="mt-1 text-xs text-zinc-600">
-                  {new Date(r.createdAt).toLocaleString("zh-TW")}
+                  分流依據：{t.reasons.join("；")}
                 </p>
               </div>
               <div className="flex gap-2">
