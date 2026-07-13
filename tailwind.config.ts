@@ -5,10 +5,10 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink: "#0d1117",
-        panel: "#161b22",
-        line: "#30363d",
-        accent: "#4f8cff",
+        ink: "#f5f7fa", // 頁面底（淺）
+        panel: "#ffffff", // 卡片底（白）
+        line: "#dfe4ec", // 邊框（淺灰）
+        accent: "#2563eb", // 主色藍（在白底上對比足夠）
       },
     },
   },

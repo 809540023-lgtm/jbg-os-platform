@@ -20,22 +20,22 @@ export default async function InquiriesPage() {
         <div>
           <Link href="/" className="text-xs text-accent hover:underline">← Dashboard</Link>
           <h1 className="mt-2 text-3xl font-bold">AI 客服</h1>
-          <p className="mt-1 text-sm text-zinc-400">
+          <p className="mt-1 text-sm text-slate-600">
             Inquiry Agent 草擬回覆，客服核定送出（議價/保固/客訴一律人審）。
           </p>
         </div>
-        <span className="rounded-full bg-amber-500/15 px-3 py-1 text-sm font-medium text-amber-300">
+        <span className="rounded-full bg-amber-500/15 px-3 py-1 text-sm font-medium text-amber-700">
           {open.length} 待處理
         </span>
       </div>
 
       {!db && (
-        <p className="rounded-lg border border-line bg-panel/60 px-4 py-3 text-sm text-zinc-500">
+        <p className="rounded-lg border border-line bg-panel/60 px-4 py-3 text-sm text-slate-500">
           未接 Supabase（缺 env）。
         </p>
       )}
       {db && open.length === 0 && (
-        <p className="rounded-lg border border-line bg-panel/60 px-4 py-6 text-center text-sm text-zinc-500">
+        <p className="rounded-lg border border-line bg-panel/60 px-4 py-6 text-center text-sm text-slate-500">
           🎉 沒有待處理詢問。
         </p>
       )}
@@ -55,48 +55,48 @@ export default async function InquiriesPage() {
                   ) : (
                     <span className="text-sm font-semibold">{q.productTitle ?? "—"}</span>
                   )}
-                  <span className="ml-2 text-xs text-zinc-500">
+                  <span className="ml-2 text-xs text-slate-500">
                     {formatPrice(q.productPrice, q.productCurrency)} · {q.channel}
                     {q.customerHandle ? ` · ${q.customerHandle}` : ""}
                   </span>
                 </div>
                 {risky ? (
-                  <span className="rounded-full bg-red-500/15 px-2 py-0.5 text-xs font-medium text-red-300">需人工確認</span>
+                  <span className="rounded-full bg-red-500/15 px-2 py-0.5 text-xs font-medium text-red-700">需人工確認</span>
                 ) : (
-                  <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-medium text-emerald-300">
+                  <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-medium text-emerald-700">
                     可自動回{q.aiConfidence != null ? ` · ${Math.round(q.aiConfidence * 100)}%` : ""}
                   </span>
                 )}
               </div>
 
-              <p className="mt-3 rounded-md bg-panel px-3 py-2 text-sm text-zinc-200">
-                <span className="text-zinc-500">買家：</span>
+              <p className="mt-3 rounded-md bg-panel px-3 py-2 text-sm text-slate-800">
+                <span className="text-slate-500">買家：</span>
                 {q.message}
               </p>
 
               {/* AI 草稿 → 可編輯送出 */}
               <form action={sendAnswerAction} className="mt-3">
                 <input type="hidden" name="id" value={q.id} />
-                <label className="text-xs text-zinc-500">
+                <label className="text-xs text-slate-500">
                   AI 草稿（可編輯後送出）
                 </label>
                 <textarea
                   name="answer"
                   rows={3}
                   defaultValue={q.aiDraft ?? ""}
-                  className="mt-1 w-full rounded-md border border-line bg-panel px-3 py-2 text-sm text-zinc-200"
+                  className="mt-1 w-full rounded-md border border-line bg-panel px-3 py-2 text-sm text-slate-800"
                 />
                 <div className="mt-2 flex gap-2">
                   <button
                     type="submit"
-                    className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-black hover:opacity-90"
+                    className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:opacity-90"
                   >
                     核定送出
                   </button>
                   <button
                     type="submit"
                     formAction={redraftAction}
-                    className="rounded-md border border-line bg-panel px-3 py-1.5 text-sm text-zinc-300 hover:border-accent/50"
+                    className="rounded-md border border-line bg-panel px-3 py-1.5 text-sm text-slate-700 hover:border-accent/50"
                   >
                     重新草擬
                   </button>

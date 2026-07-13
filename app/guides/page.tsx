@@ -13,11 +13,11 @@ export const metadata: Metadata = {
 export default function GuidesPage() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
-      <nav className="mb-6 text-xs text-zinc-500">
+      <nav className="mb-6 text-xs text-slate-500">
         <Link href="/p" className="text-accent hover:underline">← 餐飲二手設備目錄</Link>
       </nav>
       <h1 className="text-3xl font-bold">選購指南</h1>
-      <p className="mt-2 text-zinc-400">開店設備怎麼選二手 —— 避雷、驗收、省錢，一次講清楚。</p>
+      <p className="mt-2 text-slate-600">開店設備怎麼選二手 —— 避雷、驗收、省錢，一次講清楚。</p>
 
       <div className="mt-8 space-y-4">
         {GUIDES.map((g) => (
@@ -27,12 +27,12 @@ export default function GuidesPage() {
             className="block rounded-xl border border-line bg-panel/60 p-5 transition hover:border-accent/50"
           >
             <h2 className="text-lg font-semibold leading-snug">{g.title}</h2>
-            <p className="mt-2 text-sm text-zinc-400">{g.description}</p>
+            <p className="mt-2 text-sm text-slate-600">{g.description}</p>
           </Link>
         ))}
       </div>
 
-      <p className="mt-10 text-center text-xs text-zinc-600">{SITE_NAME}</p>
+      <p className="mt-10 text-center text-xs text-slate-400">{SITE_NAME}</p>
     </main>
   );
 }

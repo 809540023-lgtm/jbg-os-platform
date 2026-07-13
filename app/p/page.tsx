@@ -22,7 +22,7 @@ export default async function CatalogPage() {
     <main className="mx-auto max-w-5xl px-6 py-12">
       <header className="mb-8">
         <h1 className="text-3xl font-bold">餐飲二手設備目錄</h1>
-        <p className="mt-2 text-zinc-400">
+        <p className="mt-2 text-slate-600">
           製冰機・商用冰箱・洗碗機・爐具・不鏽鋼設備 —— 台中以北撮合直送，可驗收、附保固、款項代管。
         </p>
         <p className="mt-3 text-sm">
@@ -31,7 +31,7 @@ export default async function CatalogPage() {
       </header>
 
       {products.length === 0 ? (
-        <p className="rounded-lg border border-line bg-panel/60 px-4 py-6 text-center text-sm text-zinc-500">
+        <p className="rounded-lg border border-line bg-panel/60 px-4 py-6 text-center text-sm text-slate-500">
           目前沒有上架商品。
         </p>
       ) : (
@@ -45,12 +45,12 @@ export default async function CatalogPage() {
               <h2 className="font-semibold leading-snug">{p.title ?? "餐飲二手設備"}</h2>
               <div className="mt-2 flex items-baseline gap-2">
                 <span className="text-xl font-bold text-accent">{formatPrice(p.priceAmount, p.priceCurrency)}</span>
-                <span className="text-xs text-zinc-500">成色 {conditionLabel(p.condition)}</span>
+                <span className="text-xs text-slate-500">成色 {conditionLabel(p.condition)}</span>
               </div>
               {p.attributes.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-1.5">
                   {p.attributes.slice(0, 4).map((a) => (
-                    <span key={a.key} className="rounded bg-panel px-1.5 py-0.5 text-[11px] text-zinc-400">
+                    <span key={a.key} className="rounded bg-panel px-1.5 py-0.5 text-[11px] text-slate-600">
                       {a.value}
                     </span>
                   ))}
@@ -63,14 +63,14 @@ export default async function CatalogPage() {
 
       {/* 地區×品項內鏈（SEO） */}
       <section className="mt-12 border-t border-line pt-8">
-        <h2 className="mb-3 text-sm font-semibold text-zinc-400">依地區與品項瀏覽</h2>
+        <h2 className="mb-3 text-sm font-semibold text-slate-600">依地區與品項瀏覽</h2>
         <div className="flex flex-wrap gap-2">
           {LANDING_CATEGORIES.map((c) =>
             LANDING_REGIONS.map((r) => (
               <Link
                 key={`${c.slug}-${r.slug}`}
                 href={`/t/${c.slug}-${r.slug}`}
-                className="rounded border border-line bg-panel px-2 py-1 text-xs text-zinc-400 hover:border-accent/50 hover:text-zinc-200"
+                className="rounded border border-line bg-panel px-2 py-1 text-xs text-slate-600 hover:border-accent/50 hover:text-slate-800"
               >
                 二手{c.label} {r.label}
               </Link>
@@ -79,7 +79,7 @@ export default async function CatalogPage() {
         </div>
       </section>
 
-      <p className="mt-10 text-center text-xs text-zinc-600">{SITE_NAME}</p>
+      <p className="mt-10 text-center text-xs text-slate-400">{SITE_NAME}</p>
     </main>
   );
 }

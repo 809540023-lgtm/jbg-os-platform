@@ -6,12 +6,12 @@ import { triggerDemoRunAction } from "./actions";
 export const dynamic = "force-dynamic";
 
 const STATUS_COLOR: Record<string, string> = {
-  succeeded: "bg-emerald-500/15 text-emerald-300",
-  running: "bg-blue-500/15 text-blue-300",
-  waiting_human: "bg-amber-500/15 text-amber-300",
-  failed: "bg-red-500/15 text-red-300",
-  queued: "bg-zinc-500/15 text-zinc-300",
-  cancelled: "bg-zinc-500/15 text-zinc-400",
+  succeeded: "bg-emerald-500/15 text-emerald-700",
+  running: "bg-blue-500/15 text-blue-700",
+  waiting_human: "bg-amber-500/15 text-amber-700",
+  failed: "bg-red-500/15 text-red-700",
+  queued: "bg-zinc-500/15 text-slate-700",
+  cancelled: "bg-zinc-500/15 text-slate-600",
 };
 
 /** Loop 執行清單（Observability，§0.4 layer12 / docs/09 Loops）。 */
@@ -32,9 +32,9 @@ export default async function LoopsPage() {
           </form>
         )}
       </div>
-      {!db && <p className="text-sm text-zinc-500">未接 Supabase。</p>}
+      {!db && <p className="text-sm text-slate-500">未接 Supabase。</p>}
       {db && rows.length === 0 && (
-        <p className="rounded-lg border border-line bg-panel/60 px-4 py-6 text-center text-sm text-zinc-500">尚無執行紀錄。</p>
+        <p className="rounded-lg border border-line bg-panel/60 px-4 py-6 text-center text-sm text-slate-500">尚無執行紀錄。</p>
       )}
       <ul className="space-y-2">
         {rows.map((e) => (
@@ -47,7 +47,7 @@ export default async function LoopsPage() {
                 <span className={`rounded px-2 py-0.5 text-xs ${STATUS_COLOR[e.status] ?? "bg-panel"}`}>{e.status}</span>
                 <span className="font-mono text-sm text-accent">{e.loopSlug}</span>
               </span>
-              <span className="text-xs text-zinc-500">{e.stepCount} steps · {new Date(e.createdAt).toLocaleString("zh-TW")}</span>
+              <span className="text-xs text-slate-500">{e.stepCount} steps · {new Date(e.createdAt).toLocaleString("zh-TW")}</span>
             </Link>
           </li>
         ))}

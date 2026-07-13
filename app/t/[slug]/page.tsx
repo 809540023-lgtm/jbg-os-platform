@@ -64,25 +64,25 @@ export default async function LandingPage({ params }: { params: Promise<{ slug: 
         dangerouslySetInnerHTML={{ __html: itemListJsonLd(def, products) }}
       />
 
-      <nav className="mb-6 text-xs text-zinc-500">
+      <nav className="mb-6 text-xs text-slate-500">
         <Link href="/p" className="text-accent hover:underline">← 全部餐飲二手設備</Link>
       </nav>
 
       <h1 className="text-3xl font-bold">
         {def.title}
-        <span className="ml-2 text-lg font-normal text-zinc-400">
+        <span className="ml-2 text-lg font-normal text-slate-600">
           中古{def.category.label}{def.region ? ` ${def.region.label}` : ""} 撮合直送
         </span>
       </h1>
-      <p className="mt-3 leading-relaxed text-zinc-300">{def.category.intro}</p>
+      <p className="mt-3 leading-relaxed text-slate-700">{def.category.intro}</p>
 
       {/* 商品清單 */}
       <section className="mt-8">
-        <h2 className="mb-3 text-lg font-semibold text-zinc-200">
+        <h2 className="mb-3 text-lg font-semibold text-slate-800">
           現貨{def.region ? `（${def.region.label}）` : ""} · {products.length} 件
         </h2>
         {products.length === 0 ? (
-          <div className="rounded-lg border border-line bg-panel/60 px-4 py-5 text-sm text-zinc-400">
+          <div className="rounded-lg border border-line bg-panel/60 px-4 py-5 text-sm text-slate-600">
             此地區暫無現貨 —— 我們有貨源網絡可調貨。到
             <Link href="/p" className="mx-1 text-accent hover:underline">全部商品</Link>
             看其他地區現貨，或留下需求由我們撮合直送。
@@ -100,7 +100,7 @@ export default async function LandingPage({ params }: { params: Promise<{ slug: 
                   <span className="text-xl font-bold text-accent">
                     {formatPrice(p.priceAmount, p.priceCurrency)}
                   </span>
-                  <span className="text-xs text-zinc-500">成色 {conditionLabel(p.condition)}</span>
+                  <span className="text-xs text-slate-500">成色 {conditionLabel(p.condition)}</span>
                 </div>
               </Link>
             ))}
@@ -110,10 +110,10 @@ export default async function LandingPage({ params }: { params: Promise<{ slug: 
 
       {/* 解痛內容：挑選要點（SEO 內文 + 信任） */}
       <section className="mt-10 rounded-xl border border-line bg-panel/40 p-5">
-        <h2 className="mb-3 text-lg font-semibold text-zinc-200">
+        <h2 className="mb-3 text-lg font-semibold text-slate-800">
           二手{def.category.label}怎麼挑（避雷要點）
         </h2>
-        <ul className="space-y-2 text-sm leading-relaxed text-zinc-300">
+        <ul className="space-y-2 text-sm leading-relaxed text-slate-700">
           {def.category.buyingTips.map((tip) => (
             <li key={tip} className="flex gap-2">
               <span className="text-accent">✓</span>
@@ -121,7 +121,7 @@ export default async function LandingPage({ params }: { params: Promise<{ slug: 
             </li>
           ))}
         </ul>
-        <p className="mt-4 text-xs text-zinc-500">
+        <p className="mt-4 text-xs text-slate-500">
           每台設備由 AI 系統生成結構化狀態紀錄（規格、外觀、瑕疵、可驗收項），款項代管、驗收無誤才撥付。
         </p>
       </section>
@@ -129,13 +129,13 @@ export default async function LandingPage({ params }: { params: Promise<{ slug: 
       {/* 內部連結：其他地區 × 其他品項（SEO 內鏈網） */}
       <section className="mt-10 grid gap-6 sm:grid-cols-2">
         <div>
-          <h2 className="mb-2 text-sm font-semibold text-zinc-400">其他地區的{def.category.label}</h2>
+          <h2 className="mb-2 text-sm font-semibold text-slate-600">其他地區的{def.category.label}</h2>
           <div className="flex flex-wrap gap-2">
             {LANDING_REGIONS.filter((r) => r.slug !== def.region?.slug).map((r) => (
               <Link
                 key={r.slug}
                 href={`/t/${def.category.slug}-${r.slug}`}
-                className="rounded border border-line bg-panel px-2 py-1 text-xs text-zinc-300 hover:border-accent/50"
+                className="rounded border border-line bg-panel px-2 py-1 text-xs text-slate-700 hover:border-accent/50"
               >
                 二手{def.category.label} {r.label}
               </Link>
@@ -143,7 +143,7 @@ export default async function LandingPage({ params }: { params: Promise<{ slug: 
           </div>
         </div>
         <div>
-          <h2 className="mb-2 text-sm font-semibold text-zinc-400">
+          <h2 className="mb-2 text-sm font-semibold text-slate-600">
             {def.region ? `${def.region.label}的其他設備` : "其他設備品項"}
           </h2>
           <div className="flex flex-wrap gap-2">
@@ -151,7 +151,7 @@ export default async function LandingPage({ params }: { params: Promise<{ slug: 
               <Link
                 key={c.slug}
                 href={def.region ? `/t/${c.slug}-${def.region.slug}` : `/t/${c.slug}`}
-                className="rounded border border-line bg-panel px-2 py-1 text-xs text-zinc-300 hover:border-accent/50"
+                className="rounded border border-line bg-panel px-2 py-1 text-xs text-slate-700 hover:border-accent/50"
               >
                 二手{c.label}{def.region ? ` ${def.region.label}` : ""}
               </Link>
@@ -160,7 +160,7 @@ export default async function LandingPage({ params }: { params: Promise<{ slug: 
         </div>
       </section>
 
-      <p className="mt-10 text-center text-xs text-zinc-600">{SITE_NAME}</p>
+      <p className="mt-10 text-center text-xs text-slate-400">{SITE_NAME}</p>
     </main>
   );
 }

@@ -47,24 +47,24 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
     <main className="mx-auto max-w-3xl px-6 py-12">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: articleJsonLd(g) }} />
 
-      <nav className="mb-6 text-xs text-zinc-500">
+      <nav className="mb-6 text-xs text-slate-500">
         <Link href="/guides" className="text-accent hover:underline">← 全部選購指南</Link>
       </nav>
 
       <article>
         <h1 className="text-3xl font-bold leading-snug">{g.title}</h1>
-        <p className="mt-3 text-zinc-400">{g.description}</p>
+        <p className="mt-3 text-slate-600">{g.description}</p>
 
         {g.sections.map((s) => (
           <section key={s.heading} className="mt-8">
-            <h2 className="text-xl font-semibold text-zinc-100">{s.heading}</h2>
+            <h2 className="text-xl font-semibold text-slate-900">{s.heading}</h2>
             {s.paragraphs.map((p) => (
-              <p key={p.slice(0, 24)} className="mt-3 leading-relaxed text-zinc-300">{p}</p>
+              <p key={p.slice(0, 24)} className="mt-3 leading-relaxed text-slate-700">{p}</p>
             ))}
             {s.bullets && (
               <ul className="mt-3 space-y-2">
                 {s.bullets.map((b) => (
-                  <li key={b.slice(0, 24)} className="flex gap-2 text-sm leading-relaxed text-zinc-300">
+                  <li key={b.slice(0, 24)} className="flex gap-2 text-sm leading-relaxed text-slate-700">
                     <span className="text-accent">•</span>
                     <span>{b}</span>
                   </li>
@@ -77,8 +77,8 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
 
       {/* CTA → 落地頁/目錄（內容導流成交） */}
       <div className="mt-10 rounded-xl border border-accent/30 bg-accent/5 p-5">
-        <h2 className="font-semibold text-zinc-100">正在找設備？</h2>
-        <p className="mt-1 text-sm text-zinc-400">
+        <h2 className="font-semibold text-slate-900">正在找設備？</h2>
+        <p className="mt-1 text-sm text-slate-600">
           全部經結構化驗機、款項代管、可到府安裝。
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
@@ -89,7 +89,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
             const def = findLandingDef(slug);
             if (!def) return null;
             return (
-              <Link key={slug} href={`/t/${slug}`} className="rounded-md border border-line bg-panel px-3 py-1.5 text-sm text-zinc-300 hover:border-accent/50">
+              <Link key={slug} href={`/t/${slug}`} className="rounded-md border border-line bg-panel px-3 py-1.5 text-sm text-slate-700 hover:border-accent/50">
                 {def.title}
               </Link>
             );
@@ -97,7 +97,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
         </div>
       </div>
 
-      <p className="mt-10 text-center text-xs text-zinc-600">{SITE_NAME}</p>
+      <p className="mt-10 text-center text-xs text-slate-400">{SITE_NAME}</p>
     </main>
   );
 }

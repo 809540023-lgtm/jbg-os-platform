@@ -9,12 +9,12 @@ import { getServerDb } from "@/lib/server-db";
 export const dynamic = "force-dynamic";
 
 const STATUS_COLOR: Record<string, string> = {
-  succeeded: "bg-emerald-500/15 text-emerald-300",
-  running: "bg-blue-500/15 text-blue-300",
-  waiting_human: "bg-amber-500/15 text-amber-300",
-  failed: "bg-red-500/15 text-red-300",
-  skipped: "bg-zinc-500/15 text-zinc-400",
-  pending: "bg-zinc-500/15 text-zinc-300",
+  succeeded: "bg-emerald-500/15 text-emerald-700",
+  running: "bg-blue-500/15 text-blue-700",
+  waiting_human: "bg-amber-500/15 text-amber-700",
+  failed: "bg-red-500/15 text-red-700",
+  skipped: "bg-zinc-500/15 text-slate-600",
+  pending: "bg-zinc-500/15 text-slate-700",
 };
 
 function duration(a?: string, b?: string): string {
@@ -36,7 +36,7 @@ export default async function LoopDetailPage({
     return (
       <main className="mx-auto max-w-3xl px-6 py-12">
         <Link href="/loops" className="text-xs text-accent hover:underline">← Loops</Link>
-        <p className="mt-4 text-sm text-zinc-500">未接 Supabase。</p>
+        <p className="mt-4 text-sm text-slate-500">未接 Supabase。</p>
       </main>
     );
   }
@@ -48,7 +48,7 @@ export default async function LoopDetailPage({
     return (
       <main className="mx-auto max-w-3xl px-6 py-12">
         <Link href="/loops" className="text-xs text-accent hover:underline">← Loops</Link>
-        <p className="mt-4 text-sm text-zinc-500">找不到此 LoopExecution。</p>
+        <p className="mt-4 text-sm text-slate-500">找不到此 LoopExecution。</p>
       </main>
     );
   }
@@ -60,7 +60,7 @@ export default async function LoopDetailPage({
         <h1 className="font-mono text-2xl font-bold text-accent">{execution.loopId}</h1>
         <span className={`rounded px-2 py-0.5 text-xs ${STATUS_COLOR[execution.status] ?? "bg-panel"}`}>{execution.status}</span>
       </div>
-      <p className="mb-8 font-mono text-xs text-zinc-500">
+      <p className="mb-8 font-mono text-xs text-slate-500">
         {execution.id} · cursor {execution.cursor} · {new Date(execution.createdAt).toLocaleString("zh-TW")}
       </p>
 
@@ -71,20 +71,20 @@ export default async function LoopDetailPage({
             <div className="rounded-lg border border-line bg-panel/60 p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="flex items-center gap-2">
-                  <span className="font-mono text-xs text-zinc-500">#{s.attempt}</span>
+                  <span className="font-mono text-xs text-slate-500">#{s.attempt}</span>
                   <span className="font-medium">{s.stepDefId}</span>
-                  <span className="rounded bg-panel px-1.5 py-0.5 text-[10px] text-zinc-400">{s.type}{s.ref ? `:${s.ref}` : ""}</span>
+                  <span className="rounded bg-panel px-1.5 py-0.5 text-[10px] text-slate-600">{s.type}{s.ref ? `:${s.ref}` : ""}</span>
                 </span>
                 <span className="flex items-center gap-2">
-                  <span className="text-xs text-zinc-500">{duration(s.startedAt, s.finishedAt)}</span>
+                  <span className="text-xs text-slate-500">{duration(s.startedAt, s.finishedAt)}</span>
                   <span className={`rounded px-2 py-0.5 text-xs ${STATUS_COLOR[s.status] ?? "bg-panel"}`}>{s.status}</span>
                 </span>
               </div>
-              {s.error && <p className="mt-2 text-xs text-red-400">{s.error}</p>}
+              {s.error && <p className="mt-2 text-xs text-red-600">{s.error}</p>}
             </div>
           </li>
         ))}
-        {steps.length === 0 && <li className="text-sm text-zinc-500">尚無 step 記錄。</li>}
+        {steps.length === 0 && <li className="text-sm text-slate-500">尚無 step 記錄。</li>}
       </ol>
     </main>
   );
