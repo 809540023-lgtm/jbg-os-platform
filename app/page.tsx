@@ -68,7 +68,8 @@ export default async function DashboardPage() {
           <span className="rounded border border-line bg-panel px-2 py-1">Architecture Bible v1.0</span>
           <span className="rounded border border-line bg-panel px-2 py-1">Agents {doneAgents}/{AGENT_CODE.length}</span>
           <span className="rounded border border-line bg-panel px-2 py-1">63/63 tests ✓</span>
-          <Link href="/p" className="rounded border border-accent/50 bg-accent/10 px-2 py-1 text-accent hover:bg-accent/20">餐飲二手設備目錄 →</Link>
+          <Link href="/admin/products" className="rounded border border-accent/50 bg-accent/10 px-2 py-1 text-accent hover:bg-accent/20">＋ 商品管理／上架 →</Link>
+          <Link href="/p" className="rounded border border-line bg-panel px-2 py-1 hover:border-accent/50">商品目錄 →</Link>
           <Link href="/inquiries" className="rounded border border-line bg-panel px-2 py-1 hover:border-accent/50">AI 客服 →</Link>
           <Link href="/analytics" className="rounded border border-line bg-panel px-2 py-1 hover:border-accent/50">營運儀表板 →</Link>
           <span className={`rounded border px-2 py-1 ${live ? "border-emerald-600/50 bg-emerald-500/10 text-emerald-700" : "border-line bg-panel"}`}>

@@ -42,8 +42,8 @@ export async function GET(): Promise<Response> {
   const rows = products.map((p) => {
     const brand =
       p.attributes.find((a) => a.key === "品牌")?.value ?? "JBG OS";
-    // image_link 必填：尚未接 Drive 照片前，用站上 OG 佔位圖（上線照片後換 product_photos）。
-    const image = `${SITE_URL}/og-placeholder.svg`;
+    // image_link 必填：優先用商品實際照片，沒有才退回站上 OG 佔位圖。
+    const image = p.imageUrl ?? `${SITE_URL}/og-placeholder.svg`;
     return [
       p.id,
       p.title ?? "餐飲二手設備",

@@ -7,6 +7,9 @@ import { ADMIN_COOKIE, isValidSession } from "@/lib/auth";
  * 未設定 ADMIN_PASSWORD/ADMIN_SESSION_SECRET 時放行（本地開發/預覽）；正式環境務必設定。
  */
 export async function middleware(req: NextRequest) {
+  // 登入頁本身不保護（否則無法登入）。
+  if (req.nextUrl.pathname.startsWith("/admin/login")) return NextResponse.next();
+
   const secret = process.env.ADMIN_SESSION_SECRET;
   const password = process.env.ADMIN_PASSWORD;
   if (!secret || !password) return NextResponse.next(); // 未設定 → 不啟用（dev）
@@ -21,5 +24,12 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/reviews/:path*", "/inquiries/:path*", "/analytics/:path*", "/loops/:path*"],
+  matcher: [
+    "/",
+    "/admin/:path*",
+    "/reviews/:path*",
+    "/inquiries/:path*",
+    "/analytics/:path*",
+    "/loops/:path*",
+  ],
 };

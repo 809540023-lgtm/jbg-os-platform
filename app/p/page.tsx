@@ -40,8 +40,17 @@ export default async function CatalogPage() {
             <Link
               key={p.id}
               href={`/p/${p.id}`}
-              className="rounded-xl border border-line bg-panel/60 p-4 transition hover:border-accent/50"
+              className="overflow-hidden rounded-xl border border-line bg-panel/60 transition hover:border-accent/50"
             >
+              {p.imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={p.imageUrl} alt={p.title ?? ""} className="h-44 w-full object-cover" />
+              ) : (
+                <div className="flex h-44 w-full items-center justify-center bg-panel text-sm text-slate-400">
+                  尚無照片
+                </div>
+              )}
+              <div className="p-4">
               <h2 className="font-semibold leading-snug">{p.title ?? "餐飲二手設備"}</h2>
               <div className="mt-2 flex items-baseline gap-2">
                 <span className="text-xl font-bold text-accent">{formatPrice(p.priceAmount, p.priceCurrency)}</span>
@@ -56,6 +65,7 @@ export default async function CatalogPage() {
                   ))}
                 </div>
               )}
+              </div>
             </Link>
           ))}
         </div>

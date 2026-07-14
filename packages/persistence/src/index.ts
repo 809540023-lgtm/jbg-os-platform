@@ -6,4 +6,5 @@ export * from "./agent-repo";
 export * from "./review-repo";
 export * from "./inquiry-repo";
 export * from "./catalog-read";
+export * from "./product-admin";
 export * from "./dashboard";
