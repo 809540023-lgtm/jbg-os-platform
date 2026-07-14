@@ -16,6 +16,15 @@ export function InquiryForm({ productId }: { productId: string }) {
 
       <form action={action} className="mt-3 space-y-2">
         <input type="hidden" name="productId" value={productId} />
+        {/* 蜜罐：真人不會看到也不會填；機器人常自動填 */}
+        <input
+          type="text"
+          name="company"
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          className="absolute left-[-9999px] h-0 w-0 opacity-0"
+        />
         <input
           name="handle"
           placeholder="您的稱呼／聯絡方式（選填）"
