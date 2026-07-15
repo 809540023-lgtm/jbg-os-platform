@@ -72,6 +72,12 @@ export default async function AdminProductsPage() {
               </div>
 
               <div className="flex shrink-0 gap-2">
+                <Link
+                  href={`/admin/products/${p.id}/edit`}
+                  className="rounded-md border border-line bg-panel px-3 py-1.5 text-xs font-medium text-slate-700 hover:border-accent/50"
+                >
+                  編輯
+                </Link>
                 <form action={toggleStatusAction}>
                   <input type="hidden" name="id" value={p.id} />
                   <input type="hidden" name="status" value={isPublished ? "reviewing" : "published"} />
