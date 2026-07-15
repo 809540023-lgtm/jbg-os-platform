@@ -28,12 +28,20 @@ export default async function AdminProductsPage() {
           <h1 className="mt-2 text-3xl font-bold">商品管理</h1>
           <p className="mt-1 text-sm text-slate-600">上傳照片、填規格、上架/下架。共 {products.length} 件。</p>
         </div>
-        <Link
-          href="/admin/products/new"
-          className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-        >
-          ＋ 新增商品
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            href="/admin/import"
+            className="rounded-md border border-accent/50 bg-accent/10 px-4 py-2 text-sm font-medium text-accent hover:bg-accent/20"
+          >
+            ⬇ 從 Drive 匯入
+          </Link>
+          <Link
+            href="/admin/products/new"
+            className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+          >
+            ＋ 新增商品
+          </Link>
+        </div>
       </div>
 
       {!db && <p className="rounded-lg border border-line bg-panel/60 px-4 py-3 text-sm text-slate-500">未連線資料庫。</p>}
