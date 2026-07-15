@@ -5,7 +5,7 @@ import {
   setProductStatus,
   deleteProduct,
   updateProduct,
-  uploadProductImage,
+  uploadProductImages,
   type CatalogAttribute,
 } from "@jbg/persistence";
 import { revalidatePath } from "next/cache";
@@ -32,19 +32,23 @@ function parseAttributes(raw: string): CatalogAttribute[] {
     .map((p) => ({ key: p[0]!.trim(), value: p.slice(1).join(":").trim() }));
 }
 
-/** 上傳表單裡的照片（若有），回傳 URL 或 null；格式/大小不合則回錯誤字串。 */
-async function maybeUploadPhoto(
+/** 上傳多張照片（表單 name="photos"），回傳 URL 陣列；任一格式/大小不合則回錯誤。 */
+async function uploadPhotos(
   db: ReturnType<typeof getServerDb>,
-  file: FormDataEntryValue | null,
-): Promise<{ url?: string | null; error?: string }> {
-  if (!(file instanceof File) || file.size === 0) return { url: null };
-  if (file.size > 8 * 1024 * 1024) return { error: "照片請小於 8MB。" };
-  const ext = EXT_BY_TYPE[file.type];
-  if (!ext) return { error: "照片格式限 JPG / PNG / WebP。" };
-  const bytes = await file.arrayBuffer();
-  const keyHint = `p-${Date.now()}-${Math.round(Math.random() * 1e6)}`;
-  const url = await uploadProductImage(db!, { bytes, contentType: file.type, ext }, keyHint);
-  return { url };
+  files: FormDataEntryValue[],
+): Promise<{ urls?: string[]; error?: string }> {
+  const real = files.filter((f): f is File => f instanceof File && f.size > 0);
+  if (real.length === 0) return { urls: [] };
+  if (real.length > 15) return { error: "一次最多 15 張照片。" };
+  const prepared: { bytes: ArrayBuffer; contentType: string; ext: string }[] = [];
+  for (const f of real) {
+    if (f.size > 8 * 1024 * 1024) return { error: `照片「${f.name}」超過 8MB。` };
+    const ext = EXT_BY_TYPE[f.type];
+    if (!ext) return { error: `照片「${f.name}」格式限 JPG / PNG / WebP。` };
+    prepared.push({ bytes: await f.arrayBuffer(), contentType: f.type, ext });
+  }
+  const keyPrefix = `p-${Date.now()}-${Math.round(Math.random() * 1e6)}`;
+  return { urls: await uploadProductImages(db!, prepared, keyPrefix) };
 }
 
 /** 後台新增商品：可選上傳照片 → 建立商品列。 */
@@ -67,8 +71,8 @@ export async function createProductAction(
   const attributes = parseAttributes(String(formData.get("attributes") ?? ""));
 
   try {
-    const photo = await maybeUploadPhoto(db, formData.get("photo"));
-    if (photo.error) return { error: photo.error };
+    const photos = await uploadPhotos(db, formData.getAll("photos"));
+    if (photos.error) return { error: photos.error };
     await createProduct(db, {
       title,
       description,
@@ -77,7 +81,8 @@ export async function createProductAction(
       priceAmount,
       priceCurrency: "TWD",
       attributes,
-      imageUrl: photo.url ?? null,
+      imageUrl: photos.urls?.[0] ?? null,
+      imageUrls: photos.urls ?? [],
       category: String(formData.get("category") ?? "") || null,
       region: String(formData.get("region") ?? "") || null,
     });
@@ -108,8 +113,11 @@ export async function updateProductAction(
   if (priceRaw && Number.isNaN(priceAmount)) return { error: "價格請填數字。" };
 
   try {
-    const photo = await maybeUploadPhoto(db, formData.get("photo"));
-    if (photo.error) return { error: photo.error };
+    // 相簿 = 保留未被移除的既有照片 + 新上傳的照片
+    const kept = formData.getAll("keep").map(String).filter(Boolean);
+    const added = await uploadPhotos(db, formData.getAll("photos"));
+    if (added.error) return { error: added.error };
+    const imageUrls = [...kept, ...(added.urls ?? [])];
 
     await updateProduct(db, id, {
       title,
@@ -121,8 +129,7 @@ export async function updateProductAction(
       attributes: parseAttributes(String(formData.get("attributes") ?? "")),
       category: String(formData.get("category") ?? "") || null,
       region: String(formData.get("region") ?? "") || null,
-      // 有上傳新圖才更新 image_url；沒上傳則不動（維持舊圖）
-      ...(photo.url ? { imageUrl: photo.url } : {}),
+      imageUrls,
     });
   } catch {
     return { error: "更新失敗，請稍後再試。" };

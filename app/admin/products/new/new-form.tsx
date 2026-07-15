@@ -15,9 +15,9 @@ export function NewProductForm() {
   return (
     <form action={action} className="mt-6 space-y-4">
       <div>
-        <label className={label}>商品照片</label>
-        <input type="file" name="photo" accept="image/jpeg,image/png,image/webp" className="mt-1 text-sm text-slate-700" />
-        <p className="mt-1 text-xs text-slate-400">JPG / PNG / WebP，小於 8MB（選填，但建議放）。</p>
+        <label className={label}>商品照片（可多選）</label>
+        <input type="file" name="photos" multiple accept="image/jpeg,image/png,image/webp" className="mt-1 text-sm text-slate-700" />
+        <p className="mt-1 text-xs text-slate-400">可一次選多張，第一張為主圖。JPG / PNG / WebP，每張小於 8MB。</p>
       </div>
 
       <div>

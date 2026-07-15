@@ -17,7 +17,7 @@ export interface EditDefaults {
   status: string;
   attributes: string;
   description: string;
-  imageUrl: string | null;
+  images: string[];
   category: string;
   region: string;
 }
@@ -30,15 +30,25 @@ export function EditProductForm({ d }: { d: EditDefaults }) {
       <input type="hidden" name="id" value={d.id} />
 
       <div>
-        <label className={label}>目前照片</label>
-        {d.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={d.imageUrl} alt="" className="mt-1 h-32 w-32 rounded-md border border-line object-cover" />
+        <label className={label}>目前照片（取消勾選＝移除該張，第一張為主圖）</label>
+        {d.images.length > 0 ? (
+          <div className="mt-2 flex flex-wrap gap-3">
+            {d.images.map((url, i) => (
+              <label key={url} className="relative block cursor-pointer">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={url} alt="" className="h-24 w-24 rounded-md border border-line object-cover" />
+                {i === 0 && <span className="absolute left-1 top-1 rounded bg-accent px-1 text-[10px] text-white">主圖</span>}
+                <span className="mt-1 flex items-center gap-1 text-xs text-slate-600">
+                  <input type="checkbox" name="keep" value={url} defaultChecked /> 保留
+                </span>
+              </label>
+            ))}
+          </div>
         ) : (
           <p className="mt-1 text-xs text-slate-400">尚無照片</p>
         )}
-        <label className={`${label} mt-3`}>更換照片（不選則保留原圖）</label>
-        <input type="file" name="photo" accept="image/jpeg,image/png,image/webp" className="mt-1 text-sm text-slate-700" />
+        <label className={`${label} mt-3`}>新增照片（可多選，接在後面）</label>
+        <input type="file" name="photos" multiple accept="image/jpeg,image/png,image/webp" className="mt-1 text-sm text-slate-700" />
       </div>
 
       <div>

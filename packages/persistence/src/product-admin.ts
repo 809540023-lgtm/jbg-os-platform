@@ -12,6 +12,7 @@ export interface ProductWrite {
   priceCurrency: string;
   attributes: CatalogAttribute[];
   imageUrl: string | null;
+  imageUrls?: string[]; // 相簿；imageUrl 會自動設為第一張
   category?: string | null;
   region?: string | null;
   source?: string; // own | brokered
@@ -35,6 +36,19 @@ export async function uploadProductImage(
   return data.publicUrl;
 }
 
+/** 批次上傳多張照片，回傳公開 URL 陣列（依傳入順序）。 */
+export async function uploadProductImages(
+  db: SupabaseClient,
+  files: { bytes: ArrayBuffer; contentType: string; ext: string }[],
+  keyPrefix: string,
+): Promise<string[]> {
+  const urls: string[] = [];
+  for (let i = 0; i < files.length; i++) {
+    urls.push(await uploadProductImage(db, files[i]!, `${keyPrefix}-${i}`));
+  }
+  return urls;
+}
+
 export async function createProduct(db: SupabaseClient, p: ProductWrite): Promise<string> {
   const { data, error } = await db
     .from("products")
@@ -46,7 +60,8 @@ export async function createProduct(db: SupabaseClient, p: ProductWrite): Promis
       price_amount: p.priceAmount,
       price_currency: p.priceCurrency,
       attributes: p.attributes,
-      image_url: p.imageUrl,
+      image_url: p.imageUrls?.[0] ?? p.imageUrl,
+      image_urls: p.imageUrls ?? (p.imageUrl ? [p.imageUrl] : []),
       category: p.category ?? null,
       region: p.region ?? null,
       source: p.source ?? "own",
@@ -66,7 +81,12 @@ export async function updateProduct(db: SupabaseClient, id: string, p: Partial<P
   if (p.priceAmount !== undefined) patch.price_amount = p.priceAmount;
   if (p.priceCurrency !== undefined) patch.price_currency = p.priceCurrency;
   if (p.attributes !== undefined) patch.attributes = p.attributes;
-  if (p.imageUrl !== undefined) patch.image_url = p.imageUrl;
+  if (p.imageUrls !== undefined) {
+    patch.image_urls = p.imageUrls;
+    patch.image_url = p.imageUrls[0] ?? null; // 主圖=第一張
+  } else if (p.imageUrl !== undefined) {
+    patch.image_url = p.imageUrl;
+  }
   if (p.category !== undefined) patch.category = p.category;
   if (p.region !== undefined) patch.region = p.region;
   const { error } = await db.from("products").update(patch).eq("id", id);

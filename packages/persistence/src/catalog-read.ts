@@ -17,6 +17,7 @@ export interface CatalogProduct {
   priceCurrency: string | null;
   attributes: CatalogAttribute[];
   imageUrl: string | null;
+  imageUrls: string[];
   category: string | null;
   region: string | null;
   updatedAt: string;
@@ -32,6 +33,7 @@ interface Row {
   price_currency: string | null;
   attributes: unknown;
   image_url: string | null;
+  image_urls: unknown;
   category: string | null;
   region: string | null;
   updated_at: string;
@@ -39,6 +41,7 @@ interface Row {
 
 function toDomain(r: Row): CatalogProduct {
   const attrs = Array.isArray(r.attributes) ? (r.attributes as CatalogAttribute[]) : [];
+  const urls = Array.isArray(r.image_urls) ? (r.image_urls as string[]).filter((u) => typeof u === "string") : [];
   return {
     id: r.id,
     title: r.title,
@@ -48,7 +51,8 @@ function toDomain(r: Row): CatalogProduct {
     priceAmount: r.price_amount,
     priceCurrency: r.price_currency,
     attributes: attrs.filter((a) => a && typeof a.key === "string"),
-    imageUrl: r.image_url,
+    imageUrl: r.image_url ?? urls[0] ?? null,
+    imageUrls: urls.length > 0 ? urls : r.image_url ? [r.image_url] : [],
     category: r.category,
     region: r.region,
     updatedAt: r.updated_at,
@@ -56,7 +60,7 @@ function toDomain(r: Row): CatalogProduct {
 }
 
 const COLS =
-  "id, title, description, condition, status, price_amount, price_currency, attributes, image_url, category, region, updated_at";
+  "id, title, description, condition, status, price_amount, price_currency, attributes, image_url, image_urls, category, region, updated_at";
 
 /** 已上架（published）商品清單 —— 目錄頁與 sitemap 用。 */
 export async function listPublishedProducts(

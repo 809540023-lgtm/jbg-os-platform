@@ -7,6 +7,7 @@ import { recommend } from "@/lib/recommend";
 import { getServerDb } from "@/lib/server-db";
 import { SITE_NAME, SITE_URL, conditionLabel, formatPrice } from "@/lib/site";
 import { InquiryForm } from "./inquiry-form";
+import { ProductGallery } from "./gallery";
 
 export const dynamic = "force-dynamic";
 
@@ -97,12 +98,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       </nav>
 
       <div className="rounded-2xl border border-line bg-panel/60 p-6">
-        {p.imageUrl && (
-          <div className="mb-5 overflow-hidden rounded-xl border border-line bg-panel">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={p.imageUrl} alt={p.title ?? "商品照片"} className="max-h-[420px] w-full object-contain" />
-          </div>
-        )}
+        <ProductGallery images={p.imageUrls} alt={p.title ?? "商品照片"} />
         <div className="flex flex-wrap items-start justify-between gap-3">
           <h1 className="text-2xl font-bold leading-snug">{p.title ?? "餐飲二手設備"}</h1>
           <span

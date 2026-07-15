@@ -29,7 +29,7 @@ export async function GET(): Promise<Response> {
   const db = getServerDb();
   const header = [
     "id", "title", "description", "availability", "condition",
-    "price", "link", "image_link", "brand", "google_product_category",
+    "price", "link", "image_link", "additional_image_link", "brand", "google_product_category",
   ].join(",");
 
   if (!db) {
@@ -44,6 +44,8 @@ export async function GET(): Promise<Response> {
       p.attributes.find((a) => a.key === "品牌")?.value ?? "JBG OS";
     // image_link 必填：優先用商品實際照片，沒有才退回站上 OG 佔位圖。
     const image = p.imageUrl ?? `${SITE_URL}/og-placeholder.svg`;
+    // 相簿其餘照片放 additional_image_link（Meta 上限 10 張，逗號分隔）。
+    const extra = p.imageUrls.filter((u) => u !== image).slice(0, 10).join(",");
     return [
       p.id,
       p.title ?? "餐飲二手設備",
@@ -53,6 +55,7 @@ export async function GET(): Promise<Response> {
       `${((p.priceAmount ?? 0)).toFixed(2)} ${p.priceCurrency ?? "TWD"}`,
       `${SITE_URL}/p/${p.id}`,
       image,
+      extra,
       brand,
       "Business & Industrial > Food Service",
     ]
