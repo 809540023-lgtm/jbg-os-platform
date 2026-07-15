@@ -1,6 +1,7 @@
 import { AGENT_CODE, PRODUCT_STATUS } from "@jbg/db";
 import { listAgents, loadDashboard, type DashboardSnapshot } from "@jbg/persistence";
 import Link from "next/link";
+import { requireAdmin } from "@/lib/require-admin";
 import { getServerDb } from "./lib/server-db";
 
 export const dynamic = "force-dynamic";
@@ -52,6 +53,7 @@ async function fetchLive(): Promise<{ snap: DashboardSnapshot; agentHR: Record<s
 }
 
 export default async function DashboardPage() {
+  await requireAdmin();
   const live = await fetchLive();
   const doneAgents = AGENT_CODE.filter((c) => AGENT_META[c]?.done).length;
 
@@ -75,7 +77,7 @@ export default async function DashboardPage() {
           <span className={`rounded border px-2 py-1 ${live ? "border-emerald-600/50 bg-emerald-500/10 text-emerald-700" : "border-line bg-panel"}`}>
             {live ? "● Supabase 已連線" : "○ 靜態（未接 DB）"}
           </span>
-          <a href="/admin/logout" className="rounded border border-line bg-panel px-2 py-1 hover:border-red-500/50 hover:text-red-700">登出</a>
+          <a href="/logout" className="rounded border border-line bg-panel px-2 py-1 hover:border-red-500/50 hover:text-red-700">登出</a>
         </div>
       </header>
 

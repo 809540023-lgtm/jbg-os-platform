@@ -7,4 +7,5 @@ export * from "./review-repo";
 export * from "./inquiry-repo";
 export * from "./catalog-read";
 export * from "./product-admin";
+export * from "./admin-config-repo";
 export * from "./dashboard";

@@ -6,5 +6,5 @@ import { ADMIN_COOKIE } from "@/lib/auth";
 export async function GET(req: Request) {
   const jar = await cookies();
   jar.delete(ADMIN_COOKIE);
-  return NextResponse.redirect(new URL("/admin/login", req.url));
+  return NextResponse.redirect(new URL("/login", req.url));
 }

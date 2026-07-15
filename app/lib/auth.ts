@@ -1,12 +1,14 @@
 /**
- * 後台認證（單一營運者密碼閘）—— P0 資安。
- * 設計：共享密碼 + HMAC 簽章 cookie（cookie 不含密碼本身，無法偽造）。
- * Edge/Node 皆用 Web Crypto，故 middleware 與 server action 共用此檔。
- * 未來可升級為 Supabase Auth 多使用者（見 docs/00 §0.3）。
+ * 後台認證原語（DB-backed，免 Render env）。
+ * 密碼以 PBKDF2 雜湊存資料庫；session cookie 為 HMAC(session_secret) 簽章。
+ * 純 Web Crypto，無 next/DB 依賴，可被 server 端任意 import。
  */
 
 export const ADMIN_COOKIE = "jbg_admin";
 const SESSION_MSG = "jbg-admin-session-v1";
+const PBKDF2_ITERS = 100_000;
+
+const enc = new TextEncoder();
 
 function toHex(buf: ArrayBuffer): string {
   return Array.from(new Uint8Array(buf))
@@ -14,21 +16,32 @@ function toHex(buf: ArrayBuffer): string {
     .join("");
 }
 
-/** 由 secret 算出穩定的 session token（每次登入相同；登出即清 cookie）。 */
-export async function sessionToken(secret: string): Promise<string> {
-  const enc = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    "raw",
-    enc.encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
+/** 產生隨機 hex（session_secret / salt 用）。 */
+export function randomHex(bytes = 32): string {
+  const a = new Uint8Array(bytes);
+  crypto.getRandomValues(a);
+  return Array.from(a).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+/** 密碼雜湊：PBKDF2-SHA256，salt = session_secret。 */
+export async function hashPassword(password: string, saltHex: string): Promise<string> {
+  const key = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits(
+    { name: "PBKDF2", salt: enc.encode(saltHex), iterations: PBKDF2_ITERS, hash: "SHA-256" },
+    key,
+    256,
   );
+  return toHex(bits);
+}
+
+/** 由 session_secret 算出穩定的 session token。 */
+export async function sessionToken(secret: string): Promise<string> {
+  const key = await crypto.subtle.importKey("raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
   const sig = await crypto.subtle.sign("HMAC", key, enc.encode(SESSION_MSG));
   return toHex(sig);
 }
 
-/** 常數時間比較，避免時序側漏。 */
+/** 常數時間比較。 */
 export function safeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
   let diff = 0;
@@ -36,11 +49,9 @@ export function safeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
-/** cookie 是否為合法的已登入 session。 */
 export async function isValidSession(cookieValue: string | undefined, secret: string): Promise<boolean> {
   if (!cookieValue) return false;
-  const expected = await sessionToken(secret);
-  return safeEqual(cookieValue, expected);
+  return safeEqual(cookieValue, await sessionToken(secret));
 }
 
 /** 開放重導保護：只允許站內相對路徑。 */
