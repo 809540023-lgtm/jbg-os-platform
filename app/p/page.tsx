@@ -1,6 +1,7 @@
 import { listPublishedProducts, type CatalogProduct } from "@jbg/persistence";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { SiteFooter } from "@/components/site-footer";
 import { LANDING_CATEGORIES, LANDING_REGIONS } from "@/lib/landing";
 import { getServerDb } from "@/lib/server-db";
 import { SITE_NAME, SITE_URL, conditionLabel, formatPrice } from "@/lib/site";
@@ -89,7 +90,7 @@ export default async function CatalogPage() {
         </div>
       </section>
 
-      <p className="mt-10 text-center text-xs text-slate-400">{SITE_NAME}</p>
+      <SiteFooter />
     </main>
   );
 }

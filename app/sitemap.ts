@@ -2,6 +2,7 @@ import { listPublishedProducts } from "@jbg/persistence";
 import type { MetadataRoute } from "next";
 import { GUIDES } from "@/lib/guides";
 import { allLandingDefs } from "@/lib/landing";
+import { INFO_PAGES } from "@/lib/pages";
 import { getServerDb } from "@/lib/server-db";
 import { SITE_URL } from "@/lib/site";
 
@@ -23,6 +24,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(g.updated),
       changeFrequency: "monthly" as const,
       priority: 0.7,
+    })),
+    ...INFO_PAGES.map((p) => ({
+      url: `${SITE_URL}/info/${p.slug}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.4,
     })),
   ];
   const db = getServerDb();

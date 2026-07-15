@@ -2,6 +2,7 @@ import { getCatalogProduct, listPublishedProducts, type CatalogProduct } from "@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { SiteFooter } from "@/components/site-footer";
 import { recommend } from "@/lib/recommend";
 import { getServerDb } from "@/lib/server-db";
 import { SITE_NAME, SITE_URL, conditionLabel, formatPrice } from "@/lib/site";
@@ -172,6 +173,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       <p className="mt-8 text-center text-xs text-slate-400">
         {SITE_NAME} · 由 JBG OS 自動整備上架
       </p>
+      <SiteFooter />
     </main>
   );
 }
