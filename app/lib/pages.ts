@@ -18,8 +18,8 @@ export interface InfoPage {
 
 export const COMPANY = {
   name: "JBG OS · 餐飲二手設備撮合直送",
-  contactEmail: "【請填聯絡 Email】",
-  contactLine: "【請填 LINE ID】",
+  contactEmail: "0919355momo@gmail.com",
+  contactLine: "agag223",
   serviceArea: "台中以北（台北、新北、桃園、新竹、台中）",
 };
 
