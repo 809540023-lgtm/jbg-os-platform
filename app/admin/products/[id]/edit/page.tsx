@@ -27,6 +27,8 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
           attributes: p.attributes.map((a) => `${a.key}：${a.value}`).join("\n"),
           description: p.description ?? "",
           imageUrl: p.imageUrl,
+          category: p.category ?? "",
+          region: p.region ?? "",
         }}
       />
     </main>

@@ -17,6 +17,8 @@ export interface CatalogProduct {
   priceCurrency: string | null;
   attributes: CatalogAttribute[];
   imageUrl: string | null;
+  category: string | null;
+  region: string | null;
   updatedAt: string;
 }
 
@@ -30,6 +32,8 @@ interface Row {
   price_currency: string | null;
   attributes: unknown;
   image_url: string | null;
+  category: string | null;
+  region: string | null;
   updated_at: string;
 }
 
@@ -45,12 +49,14 @@ function toDomain(r: Row): CatalogProduct {
     priceCurrency: r.price_currency,
     attributes: attrs.filter((a) => a && typeof a.key === "string"),
     imageUrl: r.image_url,
+    category: r.category,
+    region: r.region,
     updatedAt: r.updated_at,
   };
 }
 
 const COLS =
-  "id, title, description, condition, status, price_amount, price_currency, attributes, image_url, updated_at";
+  "id, title, description, condition, status, price_amount, price_currency, attributes, image_url, category, region, updated_at";
 
 /** 已上架（published）商品清單 —— 目錄頁與 sitemap 用。 */
 export async function listPublishedProducts(

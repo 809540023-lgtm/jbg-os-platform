@@ -78,6 +78,8 @@ export async function createProductAction(
       priceCurrency: "TWD",
       attributes,
       imageUrl: photo.url ?? null,
+      category: String(formData.get("category") ?? "") || null,
+      region: String(formData.get("region") ?? "") || null,
     });
   } catch {
     return { error: "建立失敗，請稍後再試。" };
@@ -117,6 +119,8 @@ export async function updateProductAction(
       priceAmount,
       priceCurrency: "TWD",
       attributes: parseAttributes(String(formData.get("attributes") ?? "")),
+      category: String(formData.get("category") ?? "") || null,
+      region: String(formData.get("region") ?? "") || null,
       // 有上傳新圖才更新 image_url；沒上傳則不動（維持舊圖）
       ...(photo.url ? { imageUrl: photo.url } : {}),
     });

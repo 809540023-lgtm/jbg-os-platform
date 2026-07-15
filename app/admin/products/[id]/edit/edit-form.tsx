@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { LANDING_CATEGORIES, LANDING_REGIONS } from "@/lib/landing";
 import { updateProductAction, type NewProductState } from "../../actions";
 
 const initial: NewProductState = {};
@@ -17,6 +18,8 @@ export interface EditDefaults {
   attributes: string;
   description: string;
   imageUrl: string | null;
+  category: string;
+  region: string;
 }
 
 export function EditProductForm({ d }: { d: EditDefaults }) {
@@ -55,6 +58,27 @@ export function EditProductForm({ d }: { d: EditDefaults }) {
             <option value="good">良好</option>
             <option value="fair">堪用</option>
             <option value="poor">待修</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className={label}>品項分類</label>
+          <select name="category" defaultValue={d.category} className={`mt-1 ${field}`}>
+            <option value="">未分類</option>
+            {LANDING_CATEGORIES.map((c) => (
+              <option key={c.slug} value={c.slug}>{c.label}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className={label}>地區</label>
+          <select name="region" defaultValue={d.region} className={`mt-1 ${field}`}>
+            <option value="">未指定</option>
+            {LANDING_REGIONS.map((r) => (
+              <option key={r.slug} value={r.slug}>{r.label}</option>
+            ))}
           </select>
         </div>
       </div>

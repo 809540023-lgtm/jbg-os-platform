@@ -7,12 +7,22 @@ import { LANDING_CATEGORIES, LANDING_REGIONS } from "@/lib/landing";
  * 不需 DB 變更，讀既有 published 商品即可。
  */
 
-function categoryOf(p: { title: string | null; attributes: { key: string; value: string }[] }): string | null {
+type P = {
+  title: string | null;
+  attributes: { key: string; value: string }[];
+  category?: string | null;
+  region?: string | null;
+};
+
+// 優先用正式欄位；舊資料（無欄位）才回退字串比對。
+function categoryOf(p: P): string | null {
+  if (p.category) return p.category;
   const text = `${p.title ?? ""} ${p.attributes.map((a) => a.value).join(" ")}`;
   return LANDING_CATEGORIES.find((c) => c.aliases.some((a) => text.includes(a)))?.slug ?? null;
 }
 
-function regionOf(p: { title: string | null; attributes: { key: string; value: string }[] }): string | null {
+function regionOf(p: P): string | null {
+  if (p.region) return p.region;
   const text = `${p.title ?? ""} ${p.attributes.map((a) => a.value).join(" ")}`;
   return LANDING_REGIONS.find((r) => text.includes(r.label))?.slug ?? null;
 }

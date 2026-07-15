@@ -115,14 +115,28 @@ export function findLandingDef(slug: string): LandingDef | null {
   return allLandingDefs().find((d) => d.slug === slug) ?? null;
 }
 
-/** 商品是否屬於此落地頁（title/attributes 比對品項與地區）。 */
+/**
+ * 商品是否屬於此落地頁。優先用正式 category/region 欄位；
+ * 舊資料（無欄位）才回退 title/attributes 字串比對。
+ */
 export function matchesLanding(
   def: LandingDef,
-  product: { title: string | null; attributes: { key: string; value: string }[] },
+  product: {
+    title: string | null;
+    attributes: { key: string; value: string }[];
+    category?: string | null;
+    region?: string | null;
+  },
 ): boolean {
-  const text = `${product.title ?? ""} ${product.attributes.map((a) => a.value).join(" ")}`;
-  const categoryHit = def.category.aliases.some((a) => text.includes(a));
+  const categoryHit = product.category
+    ? product.category === def.category.slug
+    : (() => {
+        const text = `${product.title ?? ""} ${product.attributes.map((a) => a.value).join(" ")}`;
+        return def.category.aliases.some((a) => text.includes(a));
+      })();
   if (!categoryHit) return false;
   if (!def.region) return true;
-  return text.includes(def.region.label);
+  return product.region
+    ? product.region === def.region.slug
+    : `${product.title ?? ""} ${product.attributes.map((a) => a.value).join(" ")}`.includes(def.region.label);
 }

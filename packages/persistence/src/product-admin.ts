@@ -12,6 +12,8 @@ export interface ProductWrite {
   priceCurrency: string;
   attributes: CatalogAttribute[];
   imageUrl: string | null;
+  category?: string | null;
+  region?: string | null;
   source?: string; // own | brokered
 }
 
@@ -45,6 +47,8 @@ export async function createProduct(db: SupabaseClient, p: ProductWrite): Promis
       price_currency: p.priceCurrency,
       attributes: p.attributes,
       image_url: p.imageUrl,
+      category: p.category ?? null,
+      region: p.region ?? null,
       source: p.source ?? "own",
     })
     .select("id")
@@ -63,6 +67,8 @@ export async function updateProduct(db: SupabaseClient, id: string, p: Partial<P
   if (p.priceCurrency !== undefined) patch.price_currency = p.priceCurrency;
   if (p.attributes !== undefined) patch.attributes = p.attributes;
   if (p.imageUrl !== undefined) patch.image_url = p.imageUrl;
+  if (p.category !== undefined) patch.category = p.category;
+  if (p.region !== undefined) patch.region = p.region;
   const { error } = await db.from("products").update(patch).eq("id", id);
   if (error) throw new Error(`updateProduct: ${error.message}`);
 }
