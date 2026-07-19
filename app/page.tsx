@@ -1,215 +1,116 @@
-import { AGENT_CODE, PRODUCT_STATUS } from "@jbg/db";
-import { listAgents, loadDashboard, type DashboardSnapshot } from "@jbg/persistence";
+import { listPublishedProducts, type CatalogProduct } from "@jbg/persistence";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { requireAdmin } from "@/lib/require-admin";
-import { getServerDb } from "./lib/server-db";
+import { SiteFooter } from "@/components/site-footer";
+import { LANDING_CATEGORIES } from "@/lib/landing";
+import { getServerDb, safeList } from "@/lib/server-db";
+import { SITE_NAME, SITE_URL, conditionLabel, formatPrice, thumb } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
 /**
- * JBG OS Dashboard —— 有接 DB 時顯示即時狀態；無 DB（例如尚未設定的部署）回退靜態 canonical。
+ * 公開店面首頁 —— 訪客打根網址看到的是「店」，不是後台。
+ * 後台移至 /dashboard（受登入保護）。
  */
 
-const AGENT_META: Record<string, { name: string; role: string; done: boolean }> = {
-  vision: { name: "Vision", role: "看照片：品牌/品類/瑕疵/信心", done: true },
-  ocr: { name: "OCR", role: "抽文字：型號/序號/尺寸/成分", done: true },
-  price: { name: "Price", role: "估價：建議價/區間/理由", done: true },
-  marketing: { name: "Marketing", role: "寫 FB 文案草稿", done: true },
-  reviewer: { name: "Reviewer", role: "自動品管：pass/reject", done: true },
-  publisher: { name: "Publisher", role: "發佈到 FB（過 Policy + connector）", done: true },
-  memory: { name: "Memory", role: "從成交萃取記憶", done: true },
-  inquiry: { name: "Inquiry", role: "AI 客服：草擬詢問回覆（送出過人審）", done: true },
+export const metadata: Metadata = {
+  title: `${SITE_NAME}｜北台灣餐飲二手設備・可驗收附保固`,
+  description:
+    "北台灣餐飲二手設備撮合直送：製冰機、商用冰箱、洗碗機、爐具、不鏽鋼設備。結構化驗機紀錄、款項代管、可到府安裝，價格透明。",
+  alternates: { canonical: SITE_URL },
+  openGraph: {
+    title: SITE_NAME,
+    description: "北台灣餐飲二手設備撮合直送 —— 可驗收、附保固、款項代管。",
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    type: "website",
+  },
 };
 
-const LIFECYCLE = [
-  "drive-ingest", "perceive", "assemble", "gap-check", "price", "compose",
-  "review", "human-review", "publish", "engage", "close", "aftersale", "remember",
-];
-const DONE_STAGES = new Set([
-  "perceive", "assemble", "gap-check", "price", "compose", "review",
-  "human-review", "publish", "engage", "remember",
-]);
-
-const STATUS_COLOR: Record<string, string> = {
-  succeeded: "bg-emerald-500/15 text-emerald-700",
-  running: "bg-blue-500/15 text-blue-700",
-  waiting_human: "bg-amber-500/15 text-amber-700",
-  failed: "bg-red-500/15 text-red-700",
-  queued: "bg-zinc-500/15 text-slate-700",
-  cancelled: "bg-zinc-500/15 text-slate-600",
-};
-
-async function fetchLive(): Promise<{ snap: DashboardSnapshot; agentHR: Record<string, boolean> } | null> {
+export default async function HomePage() {
   const db = getServerDb();
-  if (!db) return null;
-  try {
-    const [snap, agents] = await Promise.all([loadDashboard(db), listAgents(db)]);
-    const agentHR: Record<string, boolean> = {};
-    for (const a of agents) agentHR[a.code] = a.requiresHumanReview;
-    return { snap, agentHR };
-  } catch {
-    return null;
-  }
-}
-
-export default async function DashboardPage() {
-  await requireAdmin();
-  const live = await fetchLive();
-  const doneAgents = AGENT_CODE.filter((c) => AGENT_META[c]?.done).length;
+  const products: CatalogProduct[] = db ? await safeList(() => listPublishedProducts(db, 8)) : [];
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-12">
-      <header className="mb-10">
-        <p className="text-sm font-medium tracking-widest text-accent">AI BUSINESS OPERATING SYSTEM</p>
-        <h1 className="mt-2 text-4xl font-bold">JBG OS</h1>
-        <p className="mt-3 max-w-2xl text-slate-600">
-          把「一個人腦中的生意流程」外化成可被 AI Agent 執行、可被人類審核、可被記憶累積、可被觀測的系統。
-          第一個實作：<span className="text-slate-800">Second-Hand AI Platform (SHAP)</span>。
+    <main className="mx-auto max-w-5xl px-6 pt-14">
+      {/* Hero */}
+      <section className="text-center">
+        <p className="text-sm font-medium tracking-widest text-accent">北台灣・撮合直送</p>
+        <h1 className="mx-auto mt-3 max-w-2xl text-4xl font-bold leading-snug">
+          餐飲二手設備，<span className="text-accent">可驗收、附保固</span>，直送到店
+        </h1>
+        <p className="mx-auto mt-4 max-w-xl text-slate-600">
+          製冰機・商用冰箱・洗碗機・爐具・不鏽鋼設備 —— 每台附結構化驗機紀錄，
+          款項代管、驗收無誤才撥款，開店成本直接省一半。
         </p>
-        <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-600">
-          <span className="rounded border border-line bg-panel px-2 py-1">Architecture Bible v1.0</span>
-          <span className="rounded border border-line bg-panel px-2 py-1">Agents {doneAgents}/{AGENT_CODE.length}</span>
-          <span className="rounded border border-line bg-panel px-2 py-1">63/63 tests ✓</span>
-          <Link href="/admin/products" className="rounded border border-accent/50 bg-accent/10 px-2 py-1 text-accent hover:bg-accent/20">＋ 商品管理／上架 →</Link>
-          <Link href="/p" className="rounded border border-line bg-panel px-2 py-1 hover:border-accent/50">商品目錄 →</Link>
-          <Link href="/inquiries" className="rounded border border-line bg-panel px-2 py-1 hover:border-accent/50">AI 客服 →</Link>
-          <Link href="/analytics" className="rounded border border-line bg-panel px-2 py-1 hover:border-accent/50">營運儀表板 →</Link>
-          <span className={`rounded border px-2 py-1 ${live ? "border-emerald-600/50 bg-emerald-500/10 text-emerald-700" : "border-line bg-panel"}`}>
-            {live ? "● Supabase 已連線" : "○ 靜態（未接 DB）"}
-          </span>
-          <a href="/logout" className="rounded border border-line bg-panel px-2 py-1 hover:border-red-500/50 hover:text-red-700">登出</a>
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <Link href="/p" className="rounded-md bg-accent px-6 py-3 text-sm font-semibold text-white hover:opacity-90">
+            瀏覽全部設備 →
+          </Link>
+          <Link href="/guides" className="rounded-md border border-line bg-panel px-6 py-3 text-sm font-medium text-slate-700 hover:border-accent/50">
+            選購指南
+          </Link>
         </div>
-      </header>
+      </section>
 
-      {live && (
-        <Section title="系統即時狀態（Supabase）">
-          <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-5">
-            <Stat label="商品" value={live.snap.productTotal} />
-            <Link href="/reviews" className="rounded-lg transition hover:ring-1 hover:ring-amber-500/40">
-              <Stat label="待人審 →" value={live.snap.pendingReviews} accent={live.snap.pendingReviews > 0} />
-            </Link>
-            <Stat label="AI 呼叫" value={live.snap.agentRunCount} />
-            <Stat label="Memories" value={live.snap.memoryCount} />
-            <Stat label="Loops" value={live.snap.loopCount} />
+      {/* 信任三承諾 */}
+      <section className="mt-14 grid gap-4 sm:grid-cols-3">
+        {[
+          { icon: "📋", t: "結構化驗機紀錄", d: "規格、成色、瑕疵、可驗收項全部寫清楚，透明取代眼見為憑。" },
+          { icon: "🔒", t: "款項代管履約", d: "款項先由平台代管，設備送達驗收無誤才撥付賣家。" },
+          { icon: "🚚", t: "可到府安裝", d: "大型設備媒合搬運與安裝，台中以北直送到店。" },
+        ].map((x) => (
+          <div key={x.t} className="rounded-xl border border-line bg-panel/60 p-5">
+            <p className="text-2xl">{x.icon}</p>
+            <h2 className="mt-2 font-semibold text-slate-800">{x.t}</h2>
+            <p className="mt-1 text-sm leading-relaxed text-slate-600">{x.d}</p>
           </div>
-          <h3 className="mb-2 flex items-center justify-between text-sm font-medium text-slate-700">
-            最近的 Loop 執行
-            <Link href="/loops" className="text-xs text-accent hover:underline">全部 →</Link>
-          </h3>
-          {live.snap.executions.length === 0 ? (
-            <p className="rounded-lg border border-line bg-panel/60 px-4 py-3 text-sm text-slate-500">
-              尚無執行紀錄。跑一次 <code className="text-slate-600">product-lifecycle</code> 就會出現在這裡。
-            </p>
-          ) : (
-            <div className="overflow-x-auto rounded-lg border border-line">
-              <table className="w-full text-sm">
-                <thead className="bg-panel text-left text-xs text-slate-500">
-                  <tr>
-                    <th className="px-3 py-2">Loop</th>
-                    <th className="px-3 py-2">狀態</th>
-                    <th className="px-3 py-2">Steps</th>
-                    <th className="px-3 py-2">時間</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {live.snap.executions.map((e) => (
-                    <tr key={e.id} className="border-t border-line/60 hover:bg-panel/40">
-                      <td className="px-3 py-2 font-mono text-xs">
-                        <Link href={`/loops/${e.id}`} className="text-accent hover:underline">{e.loopSlug}</Link>
-                      </td>
-                      <td className="px-3 py-2">
-                        <span className={`rounded px-2 py-0.5 text-xs ${STATUS_COLOR[e.status] ?? "bg-panel"}`}>{e.status}</span>
-                      </td>
-                      <td className="px-3 py-2 text-slate-600">{e.stepCount}</td>
-                      <td className="px-3 py-2 text-xs text-slate-500">{new Date(e.createdAt).toLocaleString("zh-TW")}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </Section>
+        ))}
+      </section>
+
+      {/* 最新上架 */}
+      {products.length > 0 && (
+        <section className="mt-14">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xl font-bold">最新上架</h2>
+            <Link href="/p" className="text-sm text-accent hover:underline">全部商品 →</Link>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-4">
+            {products.map((p) => (
+              <Link key={p.id} href={`/p/${p.id}`} className="overflow-hidden rounded-xl border border-line bg-panel/60 transition hover:border-accent/50">
+                {p.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={thumb(p.imageUrl, 400)} alt={p.title ?? ""} className="h-36 w-full object-cover" loading="lazy" />
+                ) : (
+                  <div className="flex h-36 w-full items-center justify-center bg-panel text-sm text-slate-400">尚無照片</div>
+                )}
+                <div className="p-3">
+                  <h3 className="line-clamp-2 text-sm font-medium leading-snug">{p.title ?? "餐飲二手設備"}</h3>
+                  <p className="mt-1 text-sm font-bold text-accent">{formatPrice(p.priceAmount, p.priceCurrency)}</p>
+                  <p className="text-[11px] text-slate-500">成色 {conditionLabel(p.condition)}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
       )}
 
-      <Section title="Canonical Agents（§0.6）">
-        <div className="grid gap-3 sm:grid-cols-2">
-          {AGENT_CODE.map((code) => {
-            const m = AGENT_META[code] ?? { name: code, role: "", done: false };
-            const hr = live?.agentHR[code];
-            return (
-              <div key={code} className="rounded-lg border border-line bg-panel/60 p-4">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold">{m.name}</span>
-                  <Badge done={m.done} />
-                </div>
-                <p className="mt-1 font-mono text-xs text-accent">{code}</p>
-                <p className="mt-2 text-sm text-slate-600">{m.role}</p>
-                {live && (
-                  <p className="mt-2 text-xs text-slate-500">
-                    需人審：{hr ? <span className="text-amber-700">是</span> : "否"}
-                    <span className="ml-1 text-slate-400">· 來源 DB</span>
-                  </p>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </Section>
-
-      <Section title="product-lifecycle 流程（§0.7）">
-        <div className="flex flex-wrap items-center gap-2">
-          {LIFECYCLE.map((stage, i) => (
-            <span key={stage} className="flex items-center gap-2">
-              <code className={`rounded px-2 py-1 text-xs ${DONE_STAGES.has(stage) ? "bg-emerald-500/15 text-emerald-700" : "border border-line bg-panel text-slate-600"}`}>{stage}</code>
-              {i < LIFECYCLE.length - 1 && <span className="text-slate-400">→</span>}
-            </span>
-          ))}
-        </div>
-      </Section>
-
-      <Section title="product_status 狀態機（§0.11，R1）">
+      {/* 品項分類入口 */}
+      <section className="mt-14">
+        <h2 className="mb-4 text-xl font-bold">找特定設備？</h2>
         <div className="flex flex-wrap gap-2">
-          {PRODUCT_STATUS.map((s) => {
-            const n = live?.snap.productCounts[s];
-            return (
-              <code key={s} className="rounded border border-line bg-panel px-2 py-1 text-xs text-slate-700">
-                {s}{n ? <span className="ml-1 text-accent">·{n}</span> : null}
-              </code>
-            );
-          })}
+          {LANDING_CATEGORIES.map((c) => (
+            <Link key={c.slug} href={`/t/${c.slug}`} className="rounded-md border border-line bg-panel px-4 py-2 text-sm text-slate-700 hover:border-accent/50">
+              二手{c.label}
+            </Link>
+          ))}
+          <Link href="/info/contact" className="rounded-md border border-accent/40 bg-accent/5 px-4 py-2 text-sm text-accent hover:bg-accent/10">
+            找不到？我們有貨源網絡可調貨 →
+          </Link>
         </div>
-      </Section>
+      </section>
 
-      <footer className="mt-12 border-t border-line pt-6 text-sm text-slate-500">
-        規格：<code className="text-slate-600">docs/</code> Architecture Bible v1.0 · SSOT =
-        <code className="text-slate-600"> docs/00-canonical-model.md</code>
-      </footer>
+      <SiteFooter />
     </main>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <section className="mb-10">
-      <h2 className="mb-4 text-lg font-semibold text-slate-800">{title}</h2>
-      {children}
-    </section>
-  );
-}
-
-function Stat({ label, value, accent }: { label: string; value: number; accent?: boolean }) {
-  return (
-    <div className="rounded-lg border border-line bg-panel/60 p-4">
-      <div className={`text-2xl font-bold ${accent ? "text-amber-700" : "text-slate-900"}`}>{value}</div>
-      <div className="mt-1 text-xs text-slate-500">{label}</div>
-    </div>
-  );
-}
-
-function Badge({ done }: { done: boolean }) {
-  return (
-    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${done ? "bg-emerald-500/15 text-emerald-700" : "bg-zinc-500/15 text-slate-600"}`}>
-      {done ? "✓ done" : "待建"}
-    </span>
   );
 }

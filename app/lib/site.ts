@@ -12,6 +12,16 @@ export function formatPrice(amount: number | null, currency: string | null): str
   return `${symbol}${amount.toLocaleString("zh-TW")}`;
 }
 
+/**
+ * Supabase Storage 圖片縮圖（Pro 方案 image transformation，已實測可用）。
+ * 非 Supabase 圖或格式不符時原樣返回。
+ */
+export function thumb(url: string, width: number, quality = 75): string {
+  if (!url.includes("/storage/v1/object/public/")) return url;
+  return url.replace("/storage/v1/object/public/", "/storage/v1/render/image/public/") +
+    `?width=${width}&quality=${quality}`;
+}
+
 const CONDITION_LABEL: Record<string, string> = {
   new: "全新",
   like_new: "近全新",

@@ -1,7 +1,7 @@
 import { listAllProducts, type CatalogProduct } from "@jbg/persistence";
 import Link from "next/link";
 import { getServerDb } from "@/lib/server-db";
-import { conditionLabel, formatPrice } from "@/lib/site";
+import { conditionLabel, formatPrice, thumb } from "@/lib/site";
 import { deleteProductAction, toggleStatusAction } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -24,7 +24,7 @@ export default async function AdminProductsPage() {
     <main className="mx-auto max-w-4xl px-6 py-12">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <Link href="/" className="text-xs text-accent hover:underline">← Dashboard</Link>
+          <Link href="/dashboard" className="text-xs text-accent hover:underline">← Dashboard</Link>
           <h1 className="mt-2 text-3xl font-bold">商品管理</h1>
           <p className="mt-1 text-sm text-slate-600">上傳照片、填規格、上架/下架。共 {products.length} 件。</p>
         </div>
@@ -60,7 +60,7 @@ export default async function AdminProductsPage() {
               <div className="h-16 w-16 shrink-0 overflow-hidden rounded-md border border-line bg-panel">
                 {p.imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.imageUrl} alt={p.title ?? ""} className="h-full w-full object-cover" />
+                  <img src={thumb(p.imageUrl, 150)} alt={p.title ?? ""} className="h-full w-full object-cover" loading="lazy" />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-xs text-slate-400">無圖</div>
                 )}

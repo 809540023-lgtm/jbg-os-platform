@@ -1,0 +1,34 @@
+# CI：每次 push / PR 自動 typecheck + 單元測試（live-DB 整合測試不在 CI 跑）。
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable pnpm (corepack)
+        run: corepack enable
+
+      # pnpm 11 預設拒跑相依套件 build script（esbuild/sharp）；vitest 需要 esbuild。
+      # 與本地開發相同作法：CI 內臨時允許（不進 repo）。
+      - name: Allow esbuild/sharp builds
+        run: printf '\nonlyBuiltDependencies:\n  - esbuild\n  - sharp\n\nallowBuilds:\n  esbuild: true\n  sharp: true\n' >> pnpm-workspace.yaml
+
+      - name: Install
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm exec tsc -p tsconfig.json --noEmit
+
+      - name: Unit tests
+        run: pnpm exec vitest run --exclude "**/tests/integration/**"

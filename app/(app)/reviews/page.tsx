@@ -26,7 +26,7 @@ export default async function ReviewsPage() {
     <main className="mx-auto max-w-3xl px-6 py-12">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <Link href="/" className="text-xs text-accent hover:underline">← Dashboard</Link>
+          <Link href="/dashboard" className="text-xs text-accent hover:underline">← Dashboard</Link>
           <h1 className="mt-2 text-3xl font-bold">Human Review</h1>
           <p className="mt-1 text-sm text-slate-600">
             待人類決策的關卡（§0.7 <code className="text-slate-700">human-review</code>）。

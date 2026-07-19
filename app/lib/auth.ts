@@ -56,6 +56,6 @@ export async function isValidSession(cookieValue: string | undefined, secret: st
 
 /** 開放重導保護：只允許站內相對路徑。 */
 export function sanitizeNext(next: string | null | undefined): string {
-  if (!next || !next.startsWith("/") || next.startsWith("//")) return "/";
+  if (!next || !next.startsWith("/") || next.startsWith("//")) return "/dashboard";
   return next;
 }

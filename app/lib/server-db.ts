@@ -10,3 +10,12 @@ export function getServerDb(): SupabaseClient | null {
   if (!url || !key) return null;
   return createServiceClient(url, key);
 }
+
+/** DB 讀取失敗（斷線等）時回空陣列，公開頁不 500。 */
+export async function safeList<T>(fn: () => Promise<T[]>): Promise<T[]> {
+  try {
+    return await fn();
+  } catch {
+    return [];
+  }
+}

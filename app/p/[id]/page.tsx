@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
 import { recommend } from "@/lib/recommend";
-import { getServerDb } from "@/lib/server-db";
+import { getServerDb, safeList } from "@/lib/server-db";
 import { SITE_NAME, SITE_URL, conditionLabel, formatPrice } from "@/lib/site";
 import { InquiryForm } from "./inquiry-form";
 import { ProductGallery } from "./gallery";
@@ -37,7 +37,15 @@ export async function generateMetadata({
     title,
     description,
     alternates: { canonical: url },
-    openGraph: { title, description, url, type: "website", siteName: SITE_NAME },
+    openGraph: {
+      title,
+      description,
+      url,
+      type: "website",
+      siteName: SITE_NAME,
+      ...(p.imageUrl ? { images: [{ url: p.imageUrl, alt: p.title ?? "商品照片" }] } : {}),
+    },
+    twitter: { card: "summary_large_image" },
   };
 }
 
@@ -85,7 +93,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   if (!p) notFound();
 
   const db = getServerDb();
-  const allPublished = db ? await listPublishedProducts(db) : [];
+  const allPublished = db ? await safeList(() => listPublishedProducts(db)) : [];
   const reco = recommend(p, allPublished);
 
   return (

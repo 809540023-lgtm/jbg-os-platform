@@ -21,7 +21,7 @@ export default async function LoopsPage() {
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
-      <Link href="/" className="text-xs text-accent hover:underline">← Dashboard</Link>
+      <Link href="/dashboard" className="text-xs text-accent hover:underline">← Dashboard</Link>
       <div className="mt-2 mb-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold">Loop 執行</h1>
         {db && (

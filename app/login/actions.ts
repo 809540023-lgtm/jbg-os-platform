@@ -37,7 +37,7 @@ export async function setupAction(_prev: LoginState, formData: FormData): Promis
   const passwordHash = await hashPassword(pw, sessionSecret);
   await setAdminConfig(db, { passwordHash, sessionSecret });
   await setSessionCookie(sessionSecret);
-  redirect("/");
+  redirect("/dashboard");
 }
 
 /** 登入（已設定密碼時）。 */

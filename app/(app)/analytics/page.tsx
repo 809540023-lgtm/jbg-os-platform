@@ -49,7 +49,7 @@ export default async function AnalyticsPage() {
   return (
     <main className="mx-auto max-w-4xl px-6 py-12">
       <div className="mb-8">
-        <Link href="/" className="text-xs text-accent hover:underline">← Dashboard</Link>
+        <Link href="/dashboard" className="text-xs text-accent hover:underline">← Dashboard</Link>
         <h1 className="mt-2 text-3xl font-bold">營運數據儀表板</h1>
         <p className="mt-1 text-sm text-slate-600">規劃書 §6.3 每週儀表板 —— 商品、詢問、人審、成本。</p>
       </div>

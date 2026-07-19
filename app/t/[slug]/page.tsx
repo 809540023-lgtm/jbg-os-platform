@@ -9,7 +9,7 @@ import {
   matchesLanding,
   type LandingDef,
 } from "@/lib/landing";
-import { getServerDb } from "@/lib/server-db";
+import { getServerDb, safeList } from "@/lib/server-db";
 import { SITE_NAME, SITE_URL, conditionLabel, formatPrice } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
@@ -54,7 +54,7 @@ export default async function LandingPage({ params }: { params: Promise<{ slug: 
   if (!def) notFound();
 
   const db = getServerDb();
-  const all = db ? await listPublishedProducts(db) : [];
+  const all = db ? await safeList(() => listPublishedProducts(db)) : [];
   const products = all.filter((p) => matchesLanding(def, p));
 
   return (

@@ -15,7 +15,12 @@ export async function requireAdmin(): Promise<void> {
   const db = getServerDb();
   if (!db) return;
 
-  const cfg = await getAdminConfig(db);
+  let cfg;
+  try {
+    cfg = await getAdminConfig(db);
+  } catch {
+    redirect("/login"); // DB 暫時不可用 → fail-closed
+  }
   if (!cfg) redirect("/login"); // 尚未設定 → 首次設定流程
 
   const cookie = (await cookies()).get(ADMIN_COOKIE)?.value;

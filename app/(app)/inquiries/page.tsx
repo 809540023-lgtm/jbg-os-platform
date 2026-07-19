@@ -18,7 +18,7 @@ export default async function InquiriesPage() {
     <main className="mx-auto max-w-3xl px-6 py-12">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <Link href="/" className="text-xs text-accent hover:underline">← Dashboard</Link>
+          <Link href="/dashboard" className="text-xs text-accent hover:underline">← Dashboard</Link>
           <h1 className="mt-2 text-3xl font-bold">AI 客服</h1>
           <p className="mt-1 text-sm text-slate-600">
             Inquiry Agent 草擬回覆，客服核定送出（議價/保固/客訴一律人審）。

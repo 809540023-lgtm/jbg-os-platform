@@ -14,7 +14,12 @@ export default async function LoginPage({
 }) {
   const { next } = await searchParams;
   const db = getServerDb();
-  const needsSetup = db ? !(await getAdminConfig(db)) : false;
+  let needsSetup = false;
+  try {
+    needsSetup = db ? !(await getAdminConfig(db)) : false;
+  } catch {
+    needsSetup = false; // DB 暫時不可用 → 顯示登入表單
+  }
 
   return (
     <main className="mx-auto flex min-h-[70vh] max-w-sm flex-col justify-center px-6">
