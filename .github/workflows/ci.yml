@@ -22,7 +22,17 @@ jobs:
       # pnpm 11 預設拒跑相依套件 build script（esbuild/sharp）；vitest 需要 esbuild。
       # 與本地開發相同作法：CI 內臨時允許（不進 repo）。
       - name: Allow esbuild/sharp builds
-        run: printf '\nonlyBuiltDependencies:\n  - esbuild\n  - sharp\n\nallowBuilds:\n  esbuild: true\n  sharp: true\n' >> pnpm-workspace.yaml
+        run: |
+          {
+            echo ""
+            echo "onlyBuiltDependencies:"
+            echo "  - esbuild"
+            echo "  - sharp"
+            echo ""
+            echo "allowBuilds:"
+            echo "  esbuild: true"
+            echo "  sharp: true"
+          } >> pnpm-workspace.yaml
 
       - name: Install
         run: pnpm install --no-frozen-lockfile
