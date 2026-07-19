@@ -21,13 +21,10 @@ jobs:
 
       # pnpm 11 預設拒跑相依套件 build script（esbuild/sharp）；vitest 需要 esbuild。
       # 與本地開發相同作法：CI 內臨時允許（不進 repo）。
+      # repo 的 pnpm-workspace.yaml 已有 onlyBuiltDependencies，只需補 allowBuilds。
       - name: Allow esbuild/sharp builds
         run: |
           {
-            echo ""
-            echo "onlyBuiltDependencies:"
-            echo "  - esbuild"
-            echo "  - sharp"
             echo ""
             echo "allowBuilds:"
             echo "  esbuild: true"
